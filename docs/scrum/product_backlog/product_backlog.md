@@ -1,115 +1,70 @@
-# PRODUCT BACKLOG - SISTEMA DE CONTROL DE TORNEOS
+# Product Backlog
 
-This document contains the prioritized features and requirements of the video game tournament control system, organized as actionable User Stories with clear Acceptance Criteria.
-
----
-
-## Definition of Done (DoD) - General Rules for All Stories
-* **Technical Standards:** UI elements must be responsive and adapt to dark mode (Chart.js/CSS). Service layers must be modular (`tournamentService`, `userService`).
-* **Security:** All endpoints under `/api/` must validate user roles (`admin` / `player`) mapping the `ROLES` database relation. Passwords must use bcrypt hashing.
-* **Testing:** Every story must include automated unit tests before being marked as complete.
+## Product Goal
+To provide a comprehensive and seamless e-sports tournament management platform (PixelGames) where administrators can efficiently organize events, track statistics, and manage participants, while players can easily discover and register for upcoming competitive events.
 
 ---
 
-## High Priority
+## Epic 1: Administrator Dashboard & Tournament Control
+**Description:** As an administrator, I need a centralized control panel to manage the lifecycle of e-sports tournaments, view system statistics, and monitor general platform activity.
 
-### US-01: User Registration & Role Assignment
-**Description:** As a **new visitor**,  
-I want to **register in the system by providing my username, email, and a password**,  
-To **create an account with an automatic default role of 'player'**.
+### User Story 1.1
+As an administrator, I want to create a new tournament so that players have new competitions to register for.
+* **Acceptance Criteria:**
+    * **Given** the administrator is logged in and on the Tournament Control section
+    * **When** they fill out the "Create Tournament" form with valid details (name, game ID, prize pool, start date) and select an initial status
+    * **Then** the system should successfully save the tournament to the database ensuring the status is linked via its proper foreign key
+    * **And** a success alert should be displayed to the user
+    * **And** the active tournaments list should refresh automatically to include the new entry.
 
-**Acceptance Criteria:**
-* [ ] **Scenario 1 (Successful Registration):** Given a visitor provides a unique username, unique email, and valid password, when they click "Register", then a new record is inserted in `USERS` linked to the `id` of 'player' in the `ROLES` table.
-* [ ] **Scenario 2 (Duplicate Prevention):** Given a username or email that already exists in the database, when the registration is submitted, then the system triggers a `UNIQUE` constraint violation error and displays: *"Username or Email already registered"*.
-* [ ] **Scenario 3 (Form UX):** When the user modifies any input field after a failed attempt, the error message must instantly clear.
-
-### US-02: User Login with Relational Roles
-**Description:** As a **registered user (Player/Admin)**,  
-I want to **log into the system with my credentials**,  
-To **access my corresponding dashboard depending on my verified role**.
-
-**Acceptance Criteria:**
-* [ ] **Scenario 1 (Role-Based Routing):** Given valid credentials, when the user logs in, the backend must execute an `INNER JOIN` between `USERS` and `ROLES`. If the role is `admin`, redirect to `/pages/Admin.jsx`; if it is `player`, redirect to `/pages/Player.jsx`.
-* [ ] **Scenario 2 (Secure Comparison):** The system must compare the plain text input with the encrypted bcrypt hash in the DB.
-* [ ] **Scenario 3 (Error Fallback):** Any routing or credential failure must be handled gracefully, returning clear feedback without crashing the session layer.
-
-### US-03: Tournament Creation (Admin)
-**Description:** As an **administrator**,  
-I want to **create a new tournament specifying its name, game, and prize pool via a form**,  
-To **publish it with an initial status of 'Created'**.
-
-**Acceptance Criteria:**
-* [ ] **Scenario 1 (Successful Creation):** Given valid form data, when the admin submits it, a new tournament is logged with a foreign key pointing to the 'Created' status in the `STATUS` table.
-* [ ] **Scenario 2 (Database Integrity):** The database constraints must prevent any `NULL` values in critical fields like `name` or `game_id`.
-* [ ] **Scenario 3 (Game Selection):** The game field must be selected via a dropdown populated directly from the database catalog.
-
-### US-04: Player Tournament Registration (Join)
-**Description:** As a **registered player**,  
-I want to **join an active tournament from the player dashboard**,  
-To **secure a slot in the competition**.
-
-**Acceptance Criteria:**
-* [ ] **Scenario 1 (Successful Entry):** Given an open tournament, when the player clicks "Join Tournament", a entry is added to the `REGISTRATION` table mapping `user_id` and `tournament_id`.
-* [ ] **Scenario 2 (Duplicate Prevention):** Given a player who is already registered for a specific tournament, when they try to click join again, the composite `UNIQUE(user_id, tournament_id)` constraint must block the action and show: *"You are already registered for this tournament"*.
+### User Story 1.2
+As an administrator, I want to view a visual summary of the platform's statistics so that I can easily understand the current volume of active tournaments and registered players.
+* **Acceptance Criteria:**
+    * **Given** the administrator accesses the Statistics section of the dashboard
+    * **When** the page loads the required data from the API
+    * **Then** a bar chart must render showing the total, active, and finished tournaments alongside total players and average prize pool
+    * **And** the chart tooltips must display the exact numeric values when hovered over.
 
 ---
 
-## Medium Priority
+## Epic 2: Player Database Management
+**Description:** As an administrator, I need specific tools to query and manage the user base, ensuring I am only interacting with relevant participant accounts.
 
-### US-05: Tournament Search via Autocomplete
-**Description:** As a **player**,  
-I want to **type in a search bar to filter tournaments dynamically**,  
-To **quickly find the specific competition or game I want to join**.
+### User Story 2.1
+As an administrator, I want to view a paginated list of all users with the "player" role (Role 3) so that I can efficiently manage the competitor database without loading unnecessary admin or staff accounts.
+* **Acceptance Criteria:**
+    * **Given** the administrator navigates to the Players Control section
+    * **When** the component fetches the user data from the API
+    * **Then** the system must display only users assigned to role ID 3 in a tabular format
+    * **And** the table must include the player's status indicator, identity (nickname/username), email, and action buttons
+    * **And** the results must be paginated, displaying a maximum of 20 players per page.
 
-**Acceptance Criteria:**
-* [ ] **Scenario 1 (Dynamic Filtering):** When the user types 3 or more characters in the search bar, the UI must filter available tournaments using the `tournamentService`.
-* [ ] **Scenario 2 (No Results):** If no tournament matches the query, the autocomplete dropdown must display: *"No tournaments found"*.
-
-### US-06: Game Carousel Display
-**Description:** As a **user**,  
-I want to **see a visual carousel of popular games on the homepage**,  
-To **explore what games currently have active communities or tournaments**.
-
-**Acceptance Criteria:**
-* [ ] **Scenario 1 (Data Fetching):** The landing page must execute a `GET` request to `/api/games` to fetch game names and image metadata.
-* [ ] **Scenario 2 (Static Image Serving):** The carousel must display high-quality images served via static assets without broken links or 404 image paths.
-
-### US-07: Admin Core Metrics Dashboard
-**Description:** As an **administrator**,  
-I want to **view a metrics dashboard with automated calculations and charts**,  
-To **analyze the overall health and size of the tournament ecosystem**.
-
-**Acceptance Criteria:**
-* [ ] **Scenario 1 (Real-Time Metrics):** The dashboard must calculate and display cards for: *Total Tournaments*, *Active Tournaments*, *Finished Tournaments*, *Total Players*, and *Average Prize Pool*.
-* [ ] **Scenario 2 (Visual Charting):** The statistics must feature a Chart.js dynamic visual component that updates using real backend data.
-* [ ] **Scenario 3 (Dashboard UX):** The charts must fully adapt to the responsive grid and adhere to the application's dark mode palette.
-
-### US-08: Tournament Lifecycle Management (Status Control)
-**Description:** As an **administrator**,  
-I want to **change the status of a tournament (In Progress, Finished, Cancelled)**,  
-To **control the lifecycle of the events and close them when they conclude**.
-
-**Acceptance Criteria:**
-* [ ] **Scenario 1 (Status Update):** Given an active tournament, when the admin changes its state to "Finished", the `status_id` in the `TOURNAMENTS` row must update to match the corresponding ID in the `STATUS` table.
-* [ ] **Scenario 2 (Cascade Behavior):** When a tournament is marked as "Cancelled", the system must notify or visually flag the status change for all registered players in that event.
+### User Story 2.2
+As an administrator, I want to search for specific players by their nickname so that I can quickly locate their profile and manage their account.
+* **Acceptance Criteria:**
+    * **Given** the administrator is viewing the Players List
+    * **When** they enter a specific nickname into the search bar and press Enter or click the Search button
+    * **Then** the pagination must reset to page 1
+    * **And** the table must display only the players matching the inputted search term.
 
 ---
 
-## Low Priority
+## Epic 3: Player Tournament Discovery & Registration
+**Description:** As a registered player, I need an intuitive way to find available tournaments for my favorite games and securely sign up for them.
 
-### US-09: Admin Registration Controls & Player Analytics
-**Description:** As an **administrator**,  
-I want to **review player participation analytics and manage registrations manually**,  
-To **oversee tournament brackets and kick/approve participants if necessary**.
+### User Story 3.1
+As a player, I want to search for active tournaments using an autocomplete text field so that I can quickly find a competition without having to scroll through long lists.
+* **Acceptance Criteria:**
+    * **Given** the player is on the Tournament Registration view
+    * **When** they type at least one letter into the search input
+    * **Then** the system must wait for a brief delay (debounce) before querying the database
+    * **And** a dropdown list of matching active tournaments (displaying name and prize pool) must appear below the input field.
 
-**Acceptance Criteria:**
-* [ ] **Scenario 1 (Advanced Statistics):** The admin panel must show time-based user activity tracking (e.g., registrations over the last 30 days).
-* [ ] **Scenario 2 (Manual Override):** The admin must have an explicit control action (button) next to each registered player in a tournament list to cancel their registration.
-
-### US-10: Player List View (Admin Panel)
-**Description:** As an **administrator**,  
-I want to **see a dedicated section with a list of all registered players**,  
-To **have a searchable directory of the user base filtered by player role**.
-
-**Acceptance Criteria:**
-* [ ] **Scenario 1 (Table view):** Navigation to the player directory triggers a fetch to `/api/users?role=player` and renders a clean data grid.
+### User Story 3.2
+As a player, I want to join a tournament I have selected from the search results so that I am officially registered as a participant.
+* **Acceptance Criteria:**
+    * **Given** the player has selected a specific tournament from the autocomplete dropdown
+    * **When** they click the "Join Tournament" button
+    * **Then** the system must send a registration request to the backend linking the player's ID to the selected tournament's ID
+    * **And** upon success, a confirmation message must be displayed on the screen
+    * **And** the search input and selected tournament state must reset.
