@@ -16,7 +16,7 @@ As an administrator, I want to create a new tournament so that players have new 
     * **Then** the system should successfully save the tournament to the database ensuring the status is linked via its proper foreign key
     * **And** a success alert should be displayed to the user
     * **And** the active tournaments list should refresh automatically to include the new entry.
-
+q
 ### User Story 1.2
 As an administrator, I want to view a visual summary of the platform's statistics so that I can easily understand the current volume of active tournaments and registered players.
 * **Acceptance Criteria:**
@@ -32,6 +32,7 @@ As an administrator, I want to view a visual summary of the platform's statistic
 
 ### User Story 2.1
 As an administrator, I want to view a paginated list of all users with the "player" role (Role 3) so that I can efficiently manage the competitor database without loading unnecessary admin or staff accounts.
+
 * **Acceptance Criteria:**
     * **Given** the administrator navigates to the Players Control section
     * **When** the component fetches the user data from the API
