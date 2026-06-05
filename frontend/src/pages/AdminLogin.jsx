@@ -31,11 +31,9 @@ function AdminLogin() {
             // Extract user role from API response
             const role = response.data.user.role_name;
 
-            // Store user ID in local storage for session tracking
-            localStorage.setItem("userId", response.data.user.id);
-
-            // Allow access only if user is admin
             if (role === "admin") {
+                localStorage.setItem("token", response.data.token);
+                localStorage.setItem("userId", response.data.user.id);
                 localStorage.setItem("role", role);
                 navigate("/admin");
             } else {
@@ -50,8 +48,9 @@ function AdminLogin() {
         Clear session and return to home page
      */
     const handleLogout = () => {
+        localStorage.removeItem("token");
         localStorage.removeItem("role");
-        localStorage.removeItem("username");
+        localStorage.removeItem("userId");
         navigate("/");
     };
 

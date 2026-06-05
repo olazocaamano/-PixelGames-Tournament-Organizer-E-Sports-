@@ -18,6 +18,116 @@ This table defines the prefixes used to identify which component of the system i
 
 ---
 
+## Version [SEC]-v10.0.0 / [BE]-v10.0.0 / [FE]-v10.0.0 / [DB]-v10.0.0 / [CONFIG]-v10.0.0 / [DOC]-v10.0.0
+### JWT Authentication, database integrity, security hardening, and documentation overhaul (June 04, 2026)
+
+This sprint focused on hardening security, enforcing referential integrity, and cleaning up technical debt. JWT-based authentication was implemented to replace the insecure localStorage-only session model. All API routes are now protected with token validation and role-based authorization. The database schema was updated with full FOREIGN KEY constraints. Multiple frontend bugs were fixed and unused dependencies were removed.
+
+---
+
+### Added
+
+- JWT-based authentication system:
+  - Token generation on login and registration (`jsonwebtoken`)
+  - `authMiddleware.js` with `authenticate` (token validation) and `authorize` (role-based access) middleware
+  - Token expiry configuration via `JWT_EXPIRES_IN` environment variable
+- Axios request interceptor for automatic JWT attachment to all API calls
+- `backend/utils/authMiddleware.js` — centralized authentication and authorization middleware
+- `JWT_SECRET` and `JWT_EXPIRES_IN` environment variables
+- FOREIGN KEY constraints across all 8 database tables:
+  - `USERS.role_id` → `ROLES.id`
+  - `TOURNAMENTS.game_id` → `GAMES.id`
+  - `TOURNAMENTS.status_id` → `STATUS.id`
+  - `TOURNAMENTS.creator_id` → `USERS.id`
+  - `REGISTRATION.user_id` → `USERS.id`
+  - `REGISTRATION.tournament_id` → `TOURNAMENTS.id`
+  - `MATCHES.tournament_id` → `TOURNAMENTS.id`
+  - `MATCHES.player_1_id` → `USERS.id`
+  - `MATCHES.player_2_id` → `USERS.id`
+  - `MATCHES.winner_id` → `USERS.id`
+  - `ACTIVITY.user_id` → `USERS.id`
+  - `ACTIVITY.tournament_id` → `TOURNAMENTS.id`
+  - `ACTIVITY.game_id` → `GAMES.id`
+  - `ACTIVITY.match_id` → `MATCHES.id`
+- `image_url` column to `GAMES` table
+
+---
+
+### Changed
+
+- Migrated database credentials from hardcoded values in `db.js` to environment variables (`.env`)
+- `USERS.role VARCHAR(20)` → `USERS.role_id INT NOT NULL` with FK to `ROLES`
+- Controllers now derive `creator_id`, `editor_id`, and `admin_id` from `req.user` (JWT payload) instead of accepting them from client requests
+- Login and registration endpoints now return a signed JWT token alongside user data
+- `PlayersList.jsx` — replaced raw `fetch()` with centralized `API` service (Axios)
+- `RegisterTournament.jsx` — replaced hardcoded `axios.get()` with `API` service and corrected route from `/api/register` to `/api/tournaments/register`
+- `tournamentService.js` — corrected `registerToTournament` route to `/tournaments/register`
+- Admin access link removed from `Home.jsx` — admin login is now accessed exclusively via `/admin/login` URL
+- `chartOptions` in `Admin.jsx` — merged duplicate `plugins` and `scales` definitions into a single configuration
+- `UserRegister.jsx` — now stores JWT token and redirects to player dashboard on successful registration
+- Logout handlers in `Admin.jsx`, `Player.jsx`, `AdminLogin.jsx` — now clear `token` from localStorage
+
+---
+
+### Fixed
+
+- ❌ `rgba(0, 0, 0, 0.2.5)` invalid CSS syntax → corrected to `rgba(0, 0, 0, 0.5)` in modal overlay (`App.css:762`)
+- ❌ Hardcoded `http://localhost:5000` URLs replaced with centralized `API` instance in `PlayersList.jsx` and `RegisterTournament.jsx`
+- ❌ `POST /api/register` wrong route → corrected to `POST /api/tournaments/register`
+- ❌ Unused `nodemailer` dependency removed from `backend/package.json`
+
+---
+
+### Security
+
+- All protected routes now require a valid JWT token via `Authorization: Bearer <token>` header
+- Role-based access enforced:
+  - `authenticate` middleware validates the token on every request
+  - `authorize('admin')` restricts admin-only endpoints
+  - Player registration endpoint (`POST /api/tournaments/register`) requires authentication
+- Server no longer trusts client-provided user IDs (`creator_id`, `editor_id`, `admin_id`)
+- Database credentials moved from source code to `.env` environment variables
+- `.env` is already included in `.gitignore` — credentials are never committed
+
+---
+
+### Removed
+
+- `nodemailer` dependency from backend (unused)
+- Hardcoded database credentials from `backend/db.js`
+- `console.log("Successfully connected to MySQL!")` from `backend/db.js`
+- Admin access link from home page (now accessible only via direct URL `/admin/login`)
+- Duplicate `plugins` and `scales` blocks in `Admin.jsx` chart configuration
+
+---
+
+### In Progress
+
+- Tournament status management (finish/cancel tournaments)
+- Player participation analytics per tournament
+- Advanced statistics (time-based activity tracking)
+- Admin controls for registrations
+
+---
+
+### System Status
+
+- All API endpoints secured with JWT authentication and role-based authorization
+- Database schema now enforces referential integrity via FOREIGN KEY constraints
+- Full flow verified:
+  - Register → Login → View games → Join tournament → Admin panel
+- Frontend, backend, and database remain fully integrated and stable
+
+---
+
+### Notes
+
+- Existing users from seed scripts remain valid — JWT is generated at login time
+- Token expiration defaults to 24 hours; configurable via `JWT_EXPIRES_IN`
+- Future sprints should focus on analytics, bracket generation, and deployment configuration
+
+---
+
 ## Version [API]-v9.8.0 / [FE]-v9.8.0 / [BE]-v9.8.0 / [DB]-v9.8.0  
 ### Tournament registration, system fixes and admin statistics (May 05, 2026)
 

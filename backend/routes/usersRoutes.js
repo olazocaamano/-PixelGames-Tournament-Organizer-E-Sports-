@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const usersController = require('../controllers/usersController');
+const { authenticate, authorize } = require('../utils/authMiddleware');
 
-router.get('/', usersController.getUsers);
+router.get('/', authenticate, authorize('admin'), usersController.getUsers);
 
-router.get('/players', usersController.getPlayers);
+router.get('/players', authenticate, authorize('admin'), usersController.getPlayers);
 
 router.post('/login', usersController.login);
 

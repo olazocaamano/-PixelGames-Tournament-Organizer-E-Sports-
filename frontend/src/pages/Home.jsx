@@ -42,10 +42,11 @@ function Home() {
 
             console.log("LOGIN RESPONSE:", response.data);
 
-            // Allow access only for player role
             if (role === "player") {
+                localStorage.setItem("token", response.data.token);
                 localStorage.setItem("user", JSON.stringify(response.data.user));
                 localStorage.setItem("role", role);
+                localStorage.setItem("userId", response.data.user.id);
                 navigate("/player");
             } else {
                 setMessage("Access denied. You are not a player.");
@@ -192,13 +193,6 @@ function Home() {
                                         Don't have an account?{" "}
                                         <Link to="/user/register">Register</Link>
                                     </p>
-                                </div>
-
-                                {/* Admin access link */}
-                                <div className="admin-access">
-                                    <Link to="/admin/login">
-                                        Administrator access
-                                    </Link>
                                 </div>
 
                                 {/* Login message */}

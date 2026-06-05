@@ -1,26 +1,17 @@
-/*
-    File: tournamentsRoutes.js
-    Description: Defines tournament related routes including registration.
-*/
-
 const express = require("express");
 const router = express.Router();
 
 const controller = require("../controllers/tournamentsController");
+const { authenticate, authorize } = require('../utils/authMiddleware');
 
-/* Get tournaments */
 router.get("/", controller.getTournaments);
 
-/* Create tournament */
-router.post("/", controller.createTournament);
+router.post("/", authenticate, authorize('admin'), controller.createTournament);
 
-/* Update tournament */
-router.put("/:id", controller.updateTournament);
+router.put("/:id", authenticate, authorize('admin'), controller.updateTournament);
 
-/* Register user to tournament */
-router.post("/register", controller.registerTournament);
+router.post("/register", authenticate, controller.registerTournament);
 
-/* Disable / finish tournament */
-router.put("/:id/status", controller.updateTournamentStatus);
+router.put("/:id/status", authenticate, authorize('admin'), controller.updateTournamentStatus);
 
 module.exports = router;

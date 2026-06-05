@@ -23,10 +23,8 @@ exports.getGames = async (req, res) => {
     }
 };
 
-// Create game
-// Inserts a new game and logs the action in activity table
 exports.createGame = async (req, res) => {
-    const { game_name, genre, publisher, release_date, admin_id } = req.body;
+    const { game_name, genre, publisher, release_date } = req.body;
 
     try {
         const [result] = await db.query(
@@ -38,7 +36,7 @@ exports.createGame = async (req, res) => {
         const newGameId = result.insertId;
 
         await logActivity({
-            user_id: admin_id,
+            user_id: req.user.id,
             game_id: newGameId,
             action_type: "NEW_GAME",
             description: `New game added: ${game_name}`

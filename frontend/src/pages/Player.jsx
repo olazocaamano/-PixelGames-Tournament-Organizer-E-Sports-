@@ -30,11 +30,11 @@ function Player() {
         }
     }, [role, navigate]);
 
-    /*
-        Logout user and clear session data
-     */
     const handleLogout = () => {
+        localStorage.removeItem("token");
         localStorage.removeItem("role");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("user");
         navigate("/");
     };
 

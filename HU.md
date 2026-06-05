@@ -12,6 +12,8 @@ This repository contains the functional requirements for the eSports platform. T
 | **US-02** | Profile and Participation | Player | 200 | US-01 |
 | **US-03** | Competition Control | Tournament Admin | 300 | US-02 |
 | **US-04** | Visualization and Results | General User | 400 | US-03 |
+| **US-05** | Authentication and Security | Admin / Player | 150 | US-01 |
+| **US-06** | Database Integrity | DBA | 250 | US-01 |
 
 ---
 
@@ -66,3 +68,30 @@ This repository contains the functional requirements for the eSports platform. T
 
 **Priority:** 400 (Medium)
 **Dependency:** US-03
+
+---
+
+### US-05: Authentication and Security
+**Story:** As a **System Administrator**, I want the platform to enforce JWT-based authentication so that all API endpoints are protected from unauthorized access.
+
+**Acceptance Criteria:**
+* The system must issue a signed JWT token upon successful login and registration.
+* All protected API endpoints must validate the JWT token on every request using middleware.
+* Admin-only endpoints must reject requests from non-admin roles with a 403 response.
+* Database credentials and JWT secret must be stored in environment variables (`.env`).
+
+**Priority:** 150 (Critical)
+**Dependency:** US-01
+
+---
+
+### US-06: Database Integrity
+**Story:** As a **Database Administrator**, I want FOREIGN KEY constraints enforced on all table relationships so that referential integrity is guaranteed at the database level.
+
+**Acceptance Criteria:**
+* All foreign key columns in TOURNAMENTS, REGISTRATION, MATCHES, and ACTIVITY must have explicit FK constraints.
+* The USERS table must use `role_id INT` with a foreign key to the ROLES table.
+* The schema definition in `01_schema_tables.sql` must match the actual running database.
+
+**Priority:** 250 (High)
+**Dependency:** US-01

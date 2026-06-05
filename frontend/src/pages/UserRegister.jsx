@@ -36,10 +36,13 @@ function UserRegister() {
                 role: "user" // Default role for new accounts
             });
 
-            // Show success message from server
             setMessage(response.data.message);
 
-            // Redirect user after successful registration
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+            localStorage.setItem("role", "player");
+            localStorage.setItem("userId", response.data.user.id);
+
             navigate("/player");
 
         } catch (err) {

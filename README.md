@@ -1,7 +1,7 @@
 # 🎮 eSports Tournament Database System
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v9.8.0-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/version-v10.0.0-blue?style=for-the-badge" />
   <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge" />
   <img src="https://img.shields.io/badge/license-academic-orange?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react" />
@@ -171,6 +171,7 @@ DB_USER=root
 DB_PASSWORD=yourpassword
 DB_NAME=esports_tournaments
 JWT_SECRET=your_secret_key
+JWT_EXPIRES_IN=24h
 ```
 
 ## Run backend server
@@ -237,6 +238,7 @@ npm run dev
 - bcrypt
 - dotenv
 - CORS
+- jsonwebtoken
 
 ---
 
@@ -274,10 +276,12 @@ npm run dev
 
 ## 👤 Authentication System
 
-- Secure login system
+- Secure login system with JWT tokens
 - Password encryption using bcrypt
 - User validation
-- Session management
+- Token-based session management with 24h expiry
+- Role-based access control (admin / player)
+- Axios interceptor for automatic token attachment
 
 ---
 
@@ -311,8 +315,11 @@ npm run dev
 # 🔒 Security Features
 
 - Password hashing with bcrypt
-- Environment variable protection
-- API validation
+- JWT token-based authentication
+- Role-based route authorization (admin / player)
+- Server-side auth middleware for all protected endpoints
+- Environment variable protection (`.env`)
+- API input validation
 - Duplicate account prevention
 - Error handling improvements
 - Secure backend routing
@@ -397,7 +404,7 @@ Artificial Intelligence tools were used to assist in:
 
 # 📌 Current Version
 
-> Latest Stable Version: **v9.8.0**
+> Latest Stable Version: **v10.0.0**
 
 📄 Full version history available in:
 

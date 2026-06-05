@@ -69,3 +69,47 @@ As a player, I want to join a tournament I have selected from the search results
     * **Then** the system must send a registration request to the backend linking the player's ID to the selected tournament's ID
     * **And** upon success, a confirmation message must be displayed on the screen
     * **And** the search input and selected tournament state must reset.
+
+---
+
+## Epic 4: Security & Authentication Hardening
+
+**Description:** As a system administrator, I need the platform to enforce secure authentication using JWT tokens and protect all API endpoints from unauthorized access.
+
+### User Story 4.1
+As an administrator, I want all API endpoints to be protected by JWT authentication so that only authenticated users can access system resources.
+* **Acceptance Criteria:**
+    * **Given** a client makes a request to a protected endpoint
+    * **When** the request lacks a valid JWT token in the Authorization header
+    * **Then** the server must return a 401 Unauthorized response
+    * **And** the requested data must not be returned.
+
+### User Story 4.2
+As an administrator, I want role-based access control on admin endpoints so that only users with the admin role can perform administrative actions.
+* **Acceptance Criteria:**
+    * **Given** a client with a valid JWT token but a non-admin role
+    * **When** they request an admin-only endpoint (e.g., POST /api/tournaments)
+    * **Then** the server must return a 403 Forbidden response
+    * **And** the action must not be performed.
+
+### User Story 4.3
+As a developer, I want database credentials and JWT secrets managed through environment variables so that sensitive information is never exposed in the source code.
+* **Acceptance Criteria:**
+    * **Given** the application is started
+    * **When** it reads database credentials and the JWT secret
+    * **Then** the values must come from the .env file
+    * **And** the .env file must be included in .gitignore to prevent accidental commits.
+
+---
+
+## Epic 5: Database Integrity
+
+**Description:** As a database administrator, I need referential integrity enforced at the database level to maintain data consistency.
+
+### User Story 5.1
+As a database administrator, I want FOREIGN KEY constraints on all table relationships so that orphan records are impossible.
+* **Acceptance Criteria:**
+    * **Given** the database schema definition
+    * **When** inspecting any child table (TOURNAMENTS, REGISTRATION, MATCHES, ACTIVITY)
+    * **Then** all foreign key columns must have explicit FK constraints referencing their parent tables
+    * **And** the constraints must use InnoDB engine for enforcement.

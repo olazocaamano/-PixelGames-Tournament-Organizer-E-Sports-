@@ -63,17 +63,14 @@ exports.createTournament = async (req, res) => {
         name,
         game_id,
         prize_pool,
-        start_date,
-        creator_id
+        start_date
     } = req.body;
 
-    // Validate required fields
     if (
         !name ||
         !game_id ||
         !prize_pool ||
-        !start_date ||
-        !creator_id
+        !start_date
     ) {
         return res.status(400).json({
             error: "All fields are required"
@@ -101,15 +98,14 @@ exports.createTournament = async (req, res) => {
                 game_id,
                 prize_pool,
                 start_date,
-                creator_id
+                req.user.id
             ]
         );
 
         const tournamentId = result.insertId;
 
-        // Log activity
         await logActivity({
-            user_id: creator_id,
+            user_id: req.user.id,
             tournament_id: tournamentId,
             action_type: "NEW_TOURNAMENT",
             description: `New tournament created: ${name}`
@@ -142,8 +138,7 @@ exports.updateTournament = async (req, res) => {
         prize_pool,
         start_date,
         status_id,
-        is_active,
-        editor_id
+        is_active
     } = req.body;
 
     try {
@@ -171,9 +166,8 @@ exports.updateTournament = async (req, res) => {
             ]
         );
 
-        // Log activity
         await logActivity({
-            user_id: editor_id,
+            user_id: req.user.id,
             tournament_id: id,
             action_type: "EDIT_TOURNAMENT",
             description: `Tournament updated: ${name}`

@@ -114,8 +114,10 @@ function Admin() {
         Logout user and clear session data
      */
     const handleLogout = () => {
+        localStorage.removeItem("token");
         localStorage.removeItem("role");
-        localStorage.removeItem("username");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("user");
         navigate("/");
     };
 
@@ -134,19 +136,11 @@ function Admin() {
         });
     };
 
-    /*
-        Create a new tournament
-     */
     const handleCreateTournament = async (e) => {
         e.preventDefault();
 
         try {
-            const creator_id = localStorage.getItem("userId");
-
-            await createTournament({
-                ...newTournament,
-                creator_id
-            });
+            await createTournament(newTournament);
 
             setCreateMessage("Tournament created successfully");
             setShowModal(false);
@@ -176,19 +170,11 @@ function Admin() {
         });
     };
 
-    /*
-        Update an existing tournament
-     */
     const handleUpdateTournament = async (e) => {
         e.preventDefault();
 
         try {
-            const editor_id = localStorage.getItem("userId");
-
-            await updateTournament(editTournament.id, {
-                ...editTournament,
-                editor_id
-            });
+            await updateTournament(editTournament.id, editTournament);
 
             setEditTournament(null);
 
@@ -290,9 +276,6 @@ function Admin() {
         ]
     };
 
-    /*
-    Improved chart configuration
-*/
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -301,7 +284,7 @@ function Admin() {
             legend: {
                 display: true,
                 labels: {
-                    color: "#f8fafc",
+                    color: "#12fb50",
                     font: {
                         size: 14
                     }
@@ -319,7 +302,7 @@ function Admin() {
         scales: {
             x: {
                 ticks: {
-                    color: "#f8fafc"
+                    color: "#12fb50"
                 },
                 grid: {
                     display: false
@@ -327,7 +310,7 @@ function Admin() {
             },
             y: {
                 ticks: {
-                    color: "#f8fafc",
+                    color: "#12fb41",
                     precision: 0
                 },
                 grid: {
@@ -339,30 +322,6 @@ function Admin() {
         animation: {
             duration: 1000,
             easing: "easeOutQuart"
-        },
-
-        responsive: true,
-        plugins: {
-            legend: {
-                labels: {
-                    color: "#ffffff",
-                    font: {
-                        size: 14
-                    }
-                }
-            }
-        },
-        scales: {
-            x: {
-                ticks: {
-                    color: "#12fb50"
-                }
-            },
-            y: {
-                ticks: {
-                    color: "#12fb41"
-                }
-            }
         }
     };
 

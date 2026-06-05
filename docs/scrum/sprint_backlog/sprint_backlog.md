@@ -351,3 +351,139 @@ Register → Login → View Games → Join Tournament → Admin Dashboard
 ```
 
 ---
+
+# Sprint Backlog — Sprint 4
+
+## JWT Authentication, Database Integrity & Security Hardening
+
+---
+
+# Sprint Goal
+
+Implement JWT-based authentication, enforce database referential integrity with FOREIGN KEY constraints, migrate credentials to environment variables, and fix frontend technical debt.
+
+---
+
+# Sprint Duration
+
+| Start Date     | End Date     | Duration |
+| -------------- | ------------ | -------- |
+| May 06, 2026   | Jun 04, 2026 | 4 Weeks  |
+
+---
+
+# Time Estimation
+
+| Total Estimated Hours | Story Points |
+| --------------------- | ------------ |
+| 80 Hours              | 60 SP        |
+
+---
+
+# User Stories
+
+### US-01
+
+As an administrator, I want API endpoints to be protected by JWT authentication so that unauthorized users cannot access sensitive data.
+
+### US-02
+
+As a user, I want my session to be secured with a token so that my credentials are not repeatedly exposed.
+
+### US-03
+
+As a database administrator, I want FOREIGN KEY constraints enforced so that referential integrity is guaranteed.
+
+### US-04
+
+As a developer, I want credentials managed via environment variables so that secrets are not committed to the repository.
+
+### US-05
+
+As a user, I want the admin login to be accessed via a direct URL so that it is not exposed on the public landing page.
+
+---
+
+# Tasks
+
+| ID    | Task                                               |
+| ----- | -------------------------------------------------- |
+| SB-01 | Install jsonwebtoken and configure JWT_SECRET      |
+| SB-02 | Create auth middleware (authenticate + authorize)  |
+| SB-03 | Generate JWT tokens on login and registration      |
+| SB-04 | Protect all routes with auth middleware            |
+| SB-05 | Update controllers to use req.user (JWT payload)   |
+| SB-06 | Add FOREIGN KEY constraints to all database tables |
+| SB-07 | Fix USERS schema (role VARCHAR → role_id INT FK)   |
+| SB-08 | Add image_url column to GAMES table                |
+| SB-09 | Create .env file for DB credentials and JWT secret |
+| SB-10 | Configure dotenv in db.js and index.js             |
+| SB-11 | Add Axios interceptor for automatic JWT attachment |
+| SB-12 | Update frontend login/register to store JWT token  |
+| SB-13 | Fix PlayersList.jsx to use centralized API service |
+| SB-14 | Fix RegisterTournament.jsx route and service usage |
+| SB-15 | Remove admin access link from home page            |
+| SB-16 | Fix invalid rgba CSS syntax in App.css             |
+| SB-17 | Merge duplicate chartOptions in Admin.jsx          |
+| SB-18 | Remove unused nodemailer dependency                |
+| SB-19 | Update CHANGELOG, SRS, README, and sprint docs     |
+
+---
+
+# Activity Time Estimation
+
+| Activity                        | Hours |
+| ------------------------------- | ----- |
+| JWT authentication              | 16    |
+| Auth middleware implementation  | 8     |
+| Route protection                | 6     |
+| Controller updates              | 6     |
+| Foreign key constraints         | 10    |
+| Schema corrections              | 6     |
+| Environment configuration       | 4     |
+| Frontend JWT integration        | 8     |
+| Frontend bug fixes              | 6     |
+| Dependency cleanup              | 2     |
+| Documentation updates           | 8     |
+
+---
+
+# Dependencies & Impediments
+
+## Dependencies
+
+* jsonwebtoken npm package
+* Existing authentication flow (bcrypt)
+* MySQL 8 with InnoDB engine (FK support)
+* dotenv npm package (already installed)
+
+## Impediments
+
+| Issue                                    | Impact   | Resolution                         |
+| ---------------------------------------- | -------- | ---------------------------------- |
+| No server-side authentication            | Critical | Implemented JWT auth middleware    |
+| Hardcoded database credentials           | High     | Migrated to .env variables         |
+| Missing FOREIGN KEY constraints          | High     | Added FKs to all 8 tables          |
+| Schema mismatch (role vs role_id)        | High     | Corrected to role_id INT with FK   |
+| Unprotected admin routes                 | Critical | Protected with authenticate + role |
+| Frontend URLs hardcoded to localhost     | Medium   | Centralized via API service        |
+| Admin login link exposed on landing page | Medium   | Removed link, accessible via URL   |
+
+---
+
+# Definition of Done (DoD)
+
+* JWT authentication fully implemented (login + register + middleware)
+* All API routes protected with role-based authorization
+* Database credentials and JWT secret in .env only
+* FOREIGN KEY constraints on all tables
+* Database schema matches the actual running database
+* Frontend automatically attaches JWT to all requests
+* Login, register, and logout flows store/clear tokens correctly
+* Invalid rgba CSS syntax fixed
+* Duplicate chartOptions merged
+* Unused nodemailer dependency removed
+* CHANGELOG, SRS, README, and sprint documentation updated
+* All changes verified — backend starts without errors
+
+---

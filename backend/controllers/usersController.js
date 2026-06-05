@@ -1,9 +1,7 @@
-/* usersController.js
-Handles user management including registration, login, and retrieval of users and players */
-
 const db = require('../db');
 const logActivity = require("../utils/activityLogger");
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 /* Get all users */
 exports.getUsers = async (req, res) => {
@@ -63,7 +61,17 @@ exports.register = async (req, res) => {
             description: `New user registered: ${username}`
         });
 
-        res.json({ message: "User registered successfully" });
+        const token = jwt.sign(
+            { id: newUserId, username, role_name: 'player' },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+        );
+
+        res.json({
+            message: "User registered successfully",
+            token,
+            user: { id: newUserId, username, role_name: 'player' }
+        });
 
     } catch (err) {
         // Handle duplicate entry error
@@ -108,9 +116,15 @@ exports.login = async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        // Return user session data
+        const token = jwt.sign(
+            { id: user.id, username: user.username, role_name: user.role_name },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+        );
+
         res.json({
             message: 'Login successful',
+            token,
             user: {
                 id: user.id,
                 username: user.username,
