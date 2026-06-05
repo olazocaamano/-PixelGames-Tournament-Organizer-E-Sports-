@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
+const { Server } = require('socket.io');
 const db = require('./db');
 const path = require('path');
 
@@ -9,7 +11,35 @@ const usersRoutes = require('./routes/usersRoutes');
 const tournamentsRoutes = require('./routes/tournamentsRoutes');
 const activityRoutes = require('./routes/activityRoutes');
 
+const { setIO } = require('./utils/socketEmitter');
+
 const app = express();
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+        methods: ['GET', 'POST', 'PUT']
+    }
+});
+
+setIO(io);
+
+io.on('connection', (socket) => {
+    console.log(`[Socket] Client connected: ${socket.id}`);
+
+    socket.on('join:user', (userId) => {
+        if (userId) {
+            socket.join(`user:${userId}`);
+            console.log(`[Socket] User ${userId} joined room user:${userId}`);
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`[Socket] Client disconnected: ${socket.id}`);
+    });
+});
 
 // Middlewares
 app.use(cors());//So that React can connect without blocking
@@ -29,7 +59,7 @@ app.get('/', (req, res) => {
 
 //Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`\n==========================================`);
     console.log(`Running server in: http://localhost:${PORT}`);
     console.log(`==========================================\n`);

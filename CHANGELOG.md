@@ -18,6 +18,89 @@ This table defines the prefixes used to identify which component of the system i
 
 ---
 
+## Version [FE]-v11.0.0 / [BE]-v11.0.0 / [API]-v11.0.0 / [DOC]-v11.0.0
+### Real-time tournament control, admin search & edit, player dashboard (June 04, 2026)
+
+This sprint introduced real-time communication via Socket.io, allowing admin tournament changes to reflect instantly on connected player dashboards. The admin panel now includes a tournament search bar and a complete edit modal with status control. Players have a dedicated "My Tournaments" section showing their registrations with live status updates.
+
+---
+
+### Added
+
+- **Real-time engine (Socket.io):**
+  - `backend/utils/socketEmitter.js` — singleton to share the Socket.io `Server` instance across controllers
+  - `frontend/src/services/socket.js` — client-side socket connection with `connectSocket(userId)` and `disconnectSocket()`
+  - Socket.io server integration in `backend/index.js` via `http.createServer` + room-based events (`join:user`)
+- **Backend socket events emitted after each operation:**
+  - `tournament:created` (broadcast) — when admin creates a tournament
+  - `tournament:updated` (broadcast) — when admin edits a tournament
+  - `tournament:statusChanged` (broadcast) — when admin changes tournament status
+  - `tournament:registered` (user room) — emitted to the specific user who registered
+- **Player "My Tournaments" section:**
+  - New nav button + dedicated page in `Player.jsx` listing all tournaments the user has joined
+  - Home section quick preview of registered tournaments with status badges
+  - Real-time listener for `tournament:registered`, `tournament:created`, `tournament:updated`, `tournament:statusChanged` events
+- **Admin tournament search bar:**
+  - Client-side filtering by name in the "Tournament Control" section
+  - Tournament list now loads up to 1000 entries (was 10) so search works across all tournaments
+- **Complete edit modal for tournaments:**
+  - Fields: Name, Game (dropdown from DB), Prize Pool, Start Date, Status (Pending/Active/Finished), Active toggle
+  - `handleEditFieldChange` handler with proper numeric conversion
+- **Games dropdown** — admin edit form loads active games via `GET /api/games?active=true`
+- **API endpoint:** `GET /api/tournaments/my-registrations/:user_id` — returns all tournaments a user is registered for
+- **`onRegisterSuccess` callback** in `TournamentAutocomplete.jsx` to notify parent on successful registration
+
+---
+
+### Changed
+
+- `backend/index.js` — migrated from `app.listen()` to `http.createServer(app)` + `server.listen()` for Socket.io compatibility
+- `backend/controllers/tournamentsController.js` — all CRUD operations now emit socket events; added `getMyTournaments` export
+- `backend/routes/tournamentsRoutes.js` — added `GET /my-registrations/:user_id` route
+- `Admin.jsx` — tournament section redesigned: added search input, games fetch, count display, and full edit form
+- `Player.jsx` — complete rewrite with "My Tournaments" section, socket connection, and live status updates
+- `TournamentAutocomplete.jsx` — accepts optional `onRegisterSuccess` prop
+- `tournamentService.js` — added `getMyTournaments(userId)` and `fetchTournaments` now passes `{ limit: 1000 }`
+- `backend/package.json` — added `socket.io` dependency
+- `frontend/package.json` — added `socket.io-client` dependency
+
+---
+
+### Fixed
+
+- Admin tournament list was limited to 10 results; now loads up to 1000
+- Edit tournament modal had empty form fields (`{/* form fields */}`); now fully implemented
+- Unused `handleEditChange` handler removed from `Admin.jsx`
+- Socket event listeners now properly cleaned up on unmount via `socket.off()`
+
+---
+
+### In Progress
+
+- Bracket/match generation and management
+- Player participation analytics per tournament
+- Advanced statistics (time-based activity tracking)
+- Admin controls for registration management
+
+---
+
+### System Status
+
+- All tournament CRUD operations reflected in real-time across admin and player sessions
+- Player dashboard now shows live-updating registered tournaments
+- Admin panel has full search and edit capabilities
+- Frontend, backend, database, and WebSocket layers are fully integrated and stable
+
+---
+
+### Notes
+
+- Restart the backend server (`node backend/index.js`) for Socket.io changes to take effect
+- Socket.io auto-connects when the player/admin dashboard loads and disconnects on logout
+- Room-based events ensure `tournament:registered` only reaches the intended user
+
+---
+
 ## Version [SEC]-v10.0.0 / [BE]-v10.0.0 / [FE]-v10.0.0 / [DB]-v10.0.0 / [CONFIG]-v10.0.0 / [DOC]-v10.0.0
 ### JWT Authentication, database integrity, security hardening, and documentation overhaul (June 04, 2026)
 

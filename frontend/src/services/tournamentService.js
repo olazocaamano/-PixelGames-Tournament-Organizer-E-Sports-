@@ -26,6 +26,10 @@ export const registerToTournament = (data) => {
     return API.post("/tournaments/register", data);
 };
 
+export const getMyTournaments = (userId) => {
+    return API.get(`/tournaments/my-registrations/${userId}`);
+};
+
 export const updateTournamentStatus = (id, data) => {
     return API.put(`/tournaments/${id}/status`, data);
 };

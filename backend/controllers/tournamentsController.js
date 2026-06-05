@@ -6,6 +6,7 @@
 
 const db = require("../db");
 const logActivity = require("../utils/activityLogger");
+const { getIO } = require("../utils/socketEmitter");
 
 /*
     Get tournaments with optional filters
@@ -111,6 +112,20 @@ exports.createTournament = async (req, res) => {
             description: `New tournament created: ${name}`
         });
 
+        const io = getIO();
+        if (io) {
+            io.emit('tournament:created', {
+                id: tournamentId,
+                name,
+                game_id,
+                prize_pool,
+                start_date,
+                status_id: 1,
+                is_active: 1,
+                creator_id: req.user.id
+            });
+        }
+
         res.json({
             message: "Tournament created successfully"
         });
@@ -172,6 +187,19 @@ exports.updateTournament = async (req, res) => {
             action_type: "EDIT_TOURNAMENT",
             description: `Tournament updated: ${name}`
         });
+
+        const io = getIO();
+        if (io) {
+            io.emit('tournament:updated', {
+                id: Number(id),
+                name,
+                game_id,
+                prize_pool,
+                start_date,
+                status_id,
+                is_active
+            });
+        }
 
         res.json({
             message: "Tournament updated successfully"
@@ -254,9 +282,50 @@ exports.registerTournament = async (req, res) => {
             description: `User registered for tournament ${tournamentName}`
         });
 
+        const io = getIO();
+        if (io) {
+            io.to(`user:${user_id}`).emit('tournament:registered', {
+                user_id,
+                tournament_id,
+                tournament_name: tournamentName
+            });
+        }
+
         res.json({
             message: "Registration successful"
         });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            error: "Database error"
+        });
+    }
+};
+
+/*
+    Get user's registered tournaments
+*/
+exports.getMyTournaments = async (req, res) => {
+
+    const { user_id } = req.params;
+
+    try {
+
+        const [results] = await db.query(
+            `
+            SELECT t.id, t.name, t.prize_pool, t.start_date, t.status_id, t.is_active
+            FROM registration r
+            JOIN tournaments t ON r.tournament_id = t.id
+            WHERE r.user_id = ?
+            ORDER BY r.registration_date DESC
+            `,
+            [user_id]
+        );
+
+        res.json(results);
 
     } catch (error) {
 
@@ -296,6 +365,15 @@ exports.updateTournamentStatus = async (req, res) => {
                 id
             ]
         );
+
+        const io = getIO();
+        if (io) {
+            io.emit('tournament:statusChanged', {
+                id: Number(id),
+                status_id,
+                is_active
+            });
+        }
 
         res.json({
             message: "Tournament status updated"

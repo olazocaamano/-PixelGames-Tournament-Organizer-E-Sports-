@@ -7,7 +7,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { registerToTournament, searchTournaments } from "../services/tournamentService";
 
-function TournamentAutocomplete() {
+function TournamentAutocomplete({ onRegisterSuccess }) {
 
     const [user, setUser] = useState(null);
 
@@ -113,6 +113,10 @@ function TournamentAutocomplete() {
             });
 
             setMessage(res.data.message || "Successfully joined tournament");
+
+            if (onRegisterSuccess) {
+                onRegisterSuccess();
+            }
 
             // Reset selection after success
             setSelectedTournament(null);

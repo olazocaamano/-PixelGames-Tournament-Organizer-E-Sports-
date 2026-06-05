@@ -4,7 +4,7 @@
     Includes creation, editing, and monitoring of tournaments and users.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "../App.css";
@@ -33,6 +33,8 @@ import {
     Tooltip,
     Legend
 } from "chart.js";
+
+import socket, { connectSocket, disconnectSocket } from "../services/socket";
 
 ChartJS.register(
     BarElement,
@@ -65,6 +67,12 @@ function Admin() {
     const [players, setPlayers] = useState([]);
     const [loadingPlayers, setLoadingPlayers] = useState(true);
     const [errorPlayers, setErrorPlayers] = useState(null);
+
+    // Games state
+    const [games, setGames] = useState([]);
+
+    // Search
+    const [searchTerm, setSearchTerm] = useState("");
 
     /*
         Load players from API on component mount
@@ -145,29 +153,13 @@ function Admin() {
             setCreateMessage("Tournament created successfully");
             setShowModal(false);
 
-            // Refresh tournaments and activity feed
-            const tournamentsResponse = await getTournaments();
-            setTournaments(tournamentsResponse.data);
+            fetchTournaments();
 
             const activitiesResponse = await API.get("/activity");
             setActivities(activitiesResponse.data);
         } catch {
             setCreateMessage("Error creating tournament");
         }
-    };
-
-    /*
-        Handle input changes for editing tournament
-     */
-    const handleEditChange = (e) => {
-        const { name, value } = e.target;
-
-        const numericFields = ["game_id", "prize_pool", "status", "is_active"];
-
-        setEditTournament({
-            ...editTournament,
-            [name]: numericFields.includes(name) ? Number(value) : value
-        });
     };
 
     const handleUpdateTournament = async (e) => {
@@ -178,31 +170,29 @@ function Admin() {
 
             setEditTournament(null);
 
-            // Refresh tournaments list after update
-            const tournamentsResponse = await getTournaments();
-            setTournaments(tournamentsResponse.data);
+            fetchTournaments();
         } catch (err) {
             console.error(err);
         }
     };
 
+    const fetchTournaments = useCallback(async () => {
+        try {
+            const response = await getTournaments({ limit: 1000 });
+            setTournaments(response.data);
+        } catch {
+            setError("Failed to load tournaments :(");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     /*
         Load tournaments on component mount
      */
     useEffect(() => {
-        const fetchTournaments = async () => {
-            try {
-                const response = await getTournaments();
-                setTournaments(response.data);
-            } catch {
-                setError("Failed to load tournaments :(");
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchTournaments();
-    }, []);
+    }, [fetchTournaments]);
 
     /*
         Load recent activity feed
@@ -221,6 +211,44 @@ function Admin() {
 
         fetchActivities();
     }, []);
+
+    /*
+        Load games for dropdown
+     */
+    useEffect(() => {
+        const fetchGames = async () => {
+            try {
+                const response = await API.get("/games", { params: { active: true } });
+                setGames(response.data);
+            } catch (err) {
+                console.error("Failed to load games", err);
+            }
+        };
+
+        fetchGames();
+    }, []);
+
+    /*
+        Socket connection for real-time updates
+     */
+    useEffect(() => {
+        const userId = localStorage.getItem("userId");
+        if (userId) {
+            connectSocket(userId);
+        }
+
+        const onRefresh = () => fetchTournaments();
+        socket.on("tournament:created", onRefresh);
+        socket.on("tournament:updated", onRefresh);
+        socket.on("tournament:statusChanged", onRefresh);
+
+        return () => {
+            socket.off("tournament:created", onRefresh);
+            socket.off("tournament:updated", onRefresh);
+            socket.off("tournament:statusChanged", onRefresh);
+            disconnectSocket();
+        };
+    }, [fetchTournaments]);
 
     // ==========================
     // STATISTICS CALCULATIONS
@@ -343,6 +371,20 @@ function Admin() {
         ]
     };
 
+    const filteredTournaments = tournaments.filter((t) =>
+        t.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleEditFieldChange = (e) => {
+        const { name, value } = e.target;
+        setEditTournament((prev) => ({
+            ...prev,
+            [name]: ["game_id", "prize_pool", "status_id", "status", "is_active"].includes(name)
+                ? Number(value)
+                : value
+        }));
+    };
+
     return (
         <div className="window-admin">
 
@@ -441,37 +483,43 @@ function Admin() {
                     <div className="admin-box">
                         <div className="top">
                             <div className="circle">
-                                <img src="./images/iconos/tournament.png" />
+                                <img src="./images/iconos/tournament.png" alt="tournament" />
                             </div>
                             <h2>Tournament Control</h2>
                         </div>
 
                         {/* Tournament management panel */}
-                        <div className="admin-container">
+                        <div className="admin-container" style={{ flexDirection: "column" }}>
 
-                            <div className="box-tournaments">
-                                <h2>Active Tournaments</h2>
+                            <div style={{ display: "flex", gap: "15px", width: "100%", padding: "0 10px" }}>
+                                <input
+                                    type="text"
+                                    placeholder="Search tournaments by name..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    style={{ flex: 1, fontSize: "18px", padding: "12px" }}
+                                />
+                                <button onClick={() => setShowModal(true)} style={{ width: "200px" }}>
+                                    Create Tournament
+                                </button>
+                            </div>
+
+                            <div className="box-tournaments" style={{ width: "100%", height: "400px" }}>
+                                <h2>All Tournaments ({filteredTournaments.length})</h2>
 
                                 <TournamentList
-                                    tournaments={tournaments}
+                                    tournaments={filteredTournaments}
                                     loading={loading}
                                     error={error}
                                     onEdit={(tournament) =>
                                         setEditTournament({
                                             ...tournament,
-                                            status: Number(tournament.status),
+                                            status_id: Number(tournament.status_id || tournament.status),
                                             is_active: Number(tournament.is_active),
                                             start_date: formatDate(tournament.start_date)
                                         })
                                     }
                                 />
-                            </div>
-
-                            {/* Button to open create tournament modal */}
-                            <div className="box-button-add">
-                                <button onClick={() => setShowModal(true)}>
-                                    Create Tournament
-                                </button>
                             </div>
                         </div>
 
@@ -492,7 +540,68 @@ function Admin() {
                             <Modal onClose={() => setEditTournament(null)}>
                                 <h2>Edit Tournament</h2>
                                 <form onSubmit={handleUpdateTournament}>
-                                    {/* form fields */}
+
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        placeholder="Tournament Name"
+                                        value={editTournament.name || ""}
+                                        onChange={handleEditFieldChange}
+                                        required
+                                    />
+
+                                    <select
+                                        name="game_id"
+                                        value={editTournament.game_id || ""}
+                                        onChange={handleEditFieldChange}
+                                        required
+                                    >
+                                        <option value="">Select Game</option>
+                                        {games.map((g) => (
+                                            <option key={g.id} value={g.id}>
+                                                {g.game_name}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    <input
+                                        type="number"
+                                        name="prize_pool"
+                                        placeholder="Prize Pool"
+                                        value={editTournament.prize_pool || ""}
+                                        onChange={handleEditFieldChange}
+                                    />
+
+                                    <input
+                                        type="datetime-local"
+                                        name="start_date"
+                                        value={editTournament.start_date || ""}
+                                        onChange={handleEditFieldChange}
+                                        required
+                                    />
+
+                                    <label style={{ color: "#ccc" }}>Status:</label>
+                                    <select
+                                        name="status_id"
+                                        value={editTournament.status_id || 1}
+                                        onChange={handleEditFieldChange}
+                                    >
+                                        <option value={1}>Pending</option>
+                                        <option value={2}>Active</option>
+                                        <option value={3}>Finished</option>
+                                    </select>
+
+                                    <label style={{ color: "#ccc" }}>Active:</label>
+                                    <select
+                                        name="is_active"
+                                        value={editTournament.is_active || 0}
+                                        onChange={handleEditFieldChange}
+                                    >
+                                        <option value={1}>Yes</option>
+                                        <option value={0}>No</option>
+                                    </select>
+
+                                    <button type="submit">Save Changes</button>
                                 </form>
                             </Modal>
                         )}

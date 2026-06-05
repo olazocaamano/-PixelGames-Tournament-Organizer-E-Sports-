@@ -12,6 +12,8 @@ router.put("/:id", authenticate, authorize('admin'), controller.updateTournament
 
 router.post("/register", authenticate, controller.registerTournament);
 
+router.get("/my-registrations/:user_id", authenticate, controller.getMyTournaments);
+
 router.put("/:id/status", authenticate, authorize('admin'), controller.updateTournamentStatus);
 
 module.exports = router;
