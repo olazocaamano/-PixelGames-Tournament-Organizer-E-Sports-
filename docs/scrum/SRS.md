@@ -280,50 +280,52 @@ Registered user who participates in tournaments.
 ---
 
 ## 7. Technology Stack
-
+ 
 ### Frontend
-
-| Technology       | Purpose                           |
-| ---------------- | --------------------------------- |
-| React.js         | User interface framework (SPA)    |
-| React Router DOM | Client-side routing               |
-| Axios            | HTTP client for API communication |
-| Chart.js         | Statistics visualization          |
-| react-chartjs-2  | Chart.js wrapper for React        |
-| CSS3 / JS (ES6+) | Styling and client-side logic     |
-
+ 
+| Technology       | Version   | Purpose                                          |
+|------------------|-----------|--------------------------------------------------|
+| React.js         | 19.2.7    | User interface framework (SPA)                  |
+| React Router DOM | 7.17.0    | Client-side routing                             |
+| Axios            | 1.17.0    | HTTP client for API communication               |
+| Chart.js         | 4.5.1     | Statistics visualization                        |
+| react-chartjs-2  | 5.3.1     | Chart.js wrapper for React                      |
+| CSS3 / JS        | ES2024+   | Styling and client-side logic                   |
+ 
 ### Backend
-
-| Technology | Purpose                           |
-| ---------- | --------------------------------- |
-| Node.js    | Server-side JavaScript runtime    |
-| Express.js | Web framework for the REST server |
-| mysql2     | MySQL connection driver           |
-| bcrypt     | Password hashing                  |
-| dotenv     | Environment variable management   |
-| CORS       | Cross-origin access control       |
-| jsonwebtoken | JWT signing and verification     |
-
+ 
+| Technology   | Version   | Purpose                                          |
+|--------------|-----------|--------------------------------------------------|
+| Node.js      | 22.22.2 LTS (Jod) | Server-side JavaScript runtime         |
+| Express.js   | 5.2.1     | Web framework for the REST server                |
+| mysql2       | 3.22.5    | MySQL connection driver                          |
+| bcrypt       | 6.0.0     | Password hashing (C++ binding)                   |
+| bcryptjs     | 3.0.3     | Password hashing (pure JS fallback)              |
+| dotenv       | 17.4.2    | Environment variable management                  |
+| cors         | 2.8.6     | Cross-origin access control                      |
+ 
 ### Database
-
-| Technology            | Purpose                              |
-| --------------------- | ------------------------------------ |
-| MySQL 8               | Relational database engine           |
-| DDL / SQL             | Schema definition and manipulation   |
-| Foreign Keys & UNIQUE | Referential integrity and uniqueness |
-| Normalization (3NF)   | Relational design without redundancy |
-
+ 
+| Technology              | Version | Purpose                                        |
+|-------------------------|---------|------------------------------------------------|
+| MySQL                   | 8.x     | Relational database engine                     |
+| DDL / SQL               | —       | Schema definition and manipulation             |
+| Foreign Keys & UNIQUE   | —       | Referential integrity and uniqueness           |
+| Normalization (3NF)     | —       | Relational design without redundancy           |
+ 
 ### Development Tools
-
-| Tool               | Purpose                                     |
-| ------------------ | ------------------------------------------- |
-| Visual Studio Code | Primary code editor                         |
-| Git + GitHub       | Version control and repository              |
-| npm                | Package manager                             |
-| Postman            | Endpoint testing and validation             |
-| MySQL Workbench    | Visual database administration              |
-| nodemon            | Automatic server restart during development |
-
+ 
+| Tool               | Version   | Purpose                                    |
+|--------------------|-----------|--------------------------------------------|
+| Visual Studio Code | Latest    | Primary code editor                        |
+| Git                | 2.x       | Version control                            |
+| GitHub             | —         | Remote repository and collaboration        |
+| npm                | 11.13.0   | Package manager                            |
+| Postman            | Latest    | Endpoint testing and validation            |
+| MySQL Workbench    | 8.x       | Visual database administration             |
+| nodemon            | 3.1.14    | Automatic server restart during development|
+ 
+> **Note on Node.js LTS:** Node.js 22 (Jod) is the recommended Active LTS (supported until April 2027). Node.js 24 (Krypton, v24.15.0) is the current LTS and also a valid choice for new setups.
 ---
 
 ## 8. System Architecture
