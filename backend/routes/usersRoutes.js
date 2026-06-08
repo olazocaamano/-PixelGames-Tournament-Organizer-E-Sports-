@@ -21,4 +21,6 @@ router.post('/forgot-password', usersController.forgotPassword);
 
 router.post('/reset-password', usersController.resetPassword);
 
+router.get('/profile/:userId', usersController.getPlayerProfile);
+
 module.exports = router;

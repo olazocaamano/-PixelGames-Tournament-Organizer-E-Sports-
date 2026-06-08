@@ -6,6 +6,7 @@ erDiagram
     USERS ||--o{ MATCHES : winner_of
     USERS ||--o{ ACTIVITY : generates
     USERS ||--o{ PASSWORD_RESETS : requests
+    USERS ||--o{ NOTIFICATIONS : receives
 
     GAMES ||--o{ TOURNAMENTS : used_in
 
@@ -64,6 +65,16 @@ erDiagram
         int player_2_id FK
         int winner_id FK
         varchar round
+    }
+
+    NOTIFICATIONS {
+        int id PK
+        int user_id FK
+        varchar message
+        varchar type
+        int related_id
+        boolean is_read
+        datetime created_at
     }
 
     ACTIVITY {

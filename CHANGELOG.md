@@ -16,7 +16,87 @@ This table defines the prefixes used to identify which component of the system i
 | **DOC**    | Documentation  | Updates or corrections to technical documentation, guides, or project specifications.              | [DOC]-1.0.1     |
 | **CONFIG** | Configuration  | Changes in system configuration files, environment variables, or runtime settings.                 | [CONFIG]-0.2.3  |
 
+
 ---
+
+## Version [FE]-v13.0.0 / [BE]-v13.0.0 / [API]-v13.0.0 / [DB]-v13.0.0 / [DOC]-v13.0.0
+### Match brackets, player profiles, leaderboards, notifications, registration management & advanced statistics (June 08, 2026)
+
+This sprint introduced a complete match bracket system with automatic pairing, player profiles with win/loss tracking, global and per-tournament leaderboards, in-app notifications, admin registration management, enhanced statistics, and tournament results views.
+
+---
+
+### Added
+
+- **Match bracket system:**
+  - `backend/controllers/matchesController.js` — Full match CRUD with bracket generation
+  - `POST /api/matches/generate/:tournamentId` — Auto-pairs registered players randomly and creates round matches
+  - `PUT /api/matches/:id/result` — Report match winner with winner validation
+  - `GET /api/matches/tournament/:tournamentId` — Get matches grouped by round
+  - `GET /api/matches/player/:userId` — Get player's match history
+  - `frontend/src/components/BracketViewer.jsx` — Visual bracket tree organized by round (Final → Semi-finals → Quarter-finals → Round 1)
+  - Admin "Brackets" section with generate and report result controls
+  - Player "My Matches" section showing win/loss per match
+  - Real-time socket events: `match:created`, `match:result`, `notification`
+  - Activity logging for match creation and results
+- **Player profiles:**
+  - `GET /api/users/profile/:userId` — Stats: wins, losses, win rate, total matches, tournaments played
+  - `frontend/src/pages/Profile.jsx` — Public profile page with avatar, stat cards, recent match history
+  - Color-coded win/loss indicators and match history timeline
+- **Leaderboards:**
+  - `GET /api/leaderboards` — Global rankings with win rate, match count, tournament count (top 100)
+  - `GET /api/leaderboards/tournament/:tournamentId` — Per-tournament rankings
+  - `frontend/src/pages/Leaderboards.jsx` — Tabbed interface (Global / Per Tournament) with medal icons
+- **Registration management (Admin):**
+  - `GET /api/tournaments/:id/registrations` — List all registrations for a tournament
+  - `DELETE /api/tournaments/:tournamentId/registrations/:userId` — Remove player registration
+  - New Admin "Registrations" section with tournament selector, player table, and remove buttons
+  - Profile links for each registered player
+- **Tournament results:**
+  - `GET /api/tournaments/:id/results` — Full tournament data, standings sorted by wins, all matches
+  - `frontend/src/pages/TournamentResults.jsx` — Standings table, bracket toggle, match list with winners
+  - Accessible from both Admin and Player dashboards
+- **In-app notifications:**
+  - New `notifications` database table (SQL in `consults/notifications.sql`)
+  - `GET /api/notifications/:userId` — Fetch notifications with unread count
+  - `PUT /api/notifications/:id/read` — Mark single notification as read
+  - `PUT /api/notifications/read-all/:userId` — Mark all as read
+  - Notification dropdown in Player dashboard with unread badge
+  - Real-time notifications via Socket.io for match assignments, wins/losses, registration changes
+- **Advanced statistics (Admin):**
+  - `GET /api/stats` — Tournaments (total/active/pending/finished), users (admins/players), matches (completed/pending), registrations, activity timeline (30-day line chart), game popularity (bar chart), top 10 players by wins
+  - Enhanced Admin "Statistics" section with 4 summary cards, 3 charts, and top players table
+- **New frontend services:**
+  - `matchService.js` — Tournament/player matches, create, report result, generate brackets
+  - `leaderboardService.js` — Global and per-tournament leaderboards
+  - `notificationService.js` — Fetch, mark read, mark all read
+- **Enhanced `getTournaments` query** — Now includes `game_name` and `status_name` via JOINs
+- **New pages:** `/profile/:userId`, `/leaderboards`, `/tournament/:id/results`
+
+### Changed
+
+- `frontend/src/App.css` — Major animation overhaul:
+  - `expandBar` animation replaced with smooth `slideDownBar` (translateY + scale + glow)
+  - `.bar` uses gradient background, fixed border-radius, `overflow: visible`
+  - `.admin-box` changed from fixed `height: 560px` to `height: auto; min-height: 560px`
+  - Added styles for `select`, `table`, `th`, `td` with Cyber Neon theme
+  - Menu items reduced from 25px to 13px font with 32px height for better fit
+  - `.left h1` reduced from 40px to 24px
+  - `.logout` selector fixed to `.menu .logout` with proper red (`#dc2626`)
+  - Added responsive breakpoints at 1200px and 768px
+  - Animations use `cubic-bezier(0.16, 1, 0.3, 1)` for smooth spring-like motion
+- `backend/controllers/tournamentsController.js` — Added `getTournamentRegistrations`, `removeRegistration`, `getTournamentResults`; enhanced `getTournaments` query with game/status JOINs
+- `backend/index.js` — Registered 4 new route modules (matches, leaderboards, notifications, stats)
+- `frontend/src/pages/Admin.jsx` — Added Registrations tab, Brackets tab with BracketViewer, enhanced Statistics with 3 charts and top players
+- `frontend/src/pages/Player.jsx` — Added My Matches section, notification dropdown with badge, Leaderboards link, My Profile link, bracket view for registered tournaments
+- `frontend/src/App.jsx` — Added 3 new routes
+- `frontend/src/services/tournamentService.js` — No changes needed (compatible)
+
+### Security
+
+- Match result endpoint validates winner is one of the two players in the match
+- Registration management requires admin authentication and authorization
+- Notification endpoints require authenticated user matching the requested userId
 
 ---
 

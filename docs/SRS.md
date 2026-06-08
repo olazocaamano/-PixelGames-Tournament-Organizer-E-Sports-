@@ -10,15 +10,15 @@
   </tr>
   <tr>
     <td><strong>Version</strong></td>
-    <td>12.0.0</td>
+    <td>13.0.0</td>
   </tr>
   <tr>
     <td><strong>Date</strong></td>
-    <td>2026-06-07</td>
+    <td>2026-06-08</td>
   </tr>
   <tr>
     <td><strong>Status</strong></td>
-    <td>In development — Cyber Neon redesign, password reset & admin management implemented</td>
+    <td>In development — Match brackets, player profiles, leaderboards & notifications implemented</td>
   </tr>
   <tr>
     <td><strong>Repository</strong></td>
@@ -71,20 +71,26 @@
 This document specifies the software requirements for the **eSports Tournament Database System**, a full-stack web application for managing competitive video game tournaments. It serves as the official technical reference for the development team throughout the entire project lifecycle.
 
 ### 1.2 Scope
-The system allows users to create, manage, and participate in video game tournaments through a web platform. The modules covered in the current version (v12.0.0) are:
+The system allows users to create, manage, and participate in video game tournaments through a web platform. The modules covered in the current version (v13.0.0) are:
 
 - Authentication and role-based access control
 - Tournament management (full CRUD)
 - Player registration and tournament enrollment
 - Video game catalog and carousel
-- Admin statistics dashboard
+- Admin statistics dashboard with activity timeline, game popularity, and top players
 - System activity logging
 - Real-time updates via Socket.io
 - Password reset via email
 - Admin management (create, list, demote)
 - Cyber Neon themed UI with animated background
+- **Match & Bracket system** — automatic bracket generation, round progression, result reporting, visual bracket viewer
+- **Player profiles** — win/loss stats, win rate, match history
+- **Leaderboards** — global and per-tournament rankings with medals
+- **In-app notifications** — real-time alerts for match assignments, results, and registration changes
+- **Admin registration management** — view and remove player registrations
+- **Tournament results** — standings, match list, and bracket view
 
-Features such as real-time brackets, advanced analytics, and notifications are **in progress** or planned for future versions.
+Features such as advanced player participation analytics and system-wide search are planned for future versions.
 
 ### 1.3 Definitions and Acronyms
 
@@ -163,8 +169,12 @@ Full system access. Manages tournaments, views statistics, and oversees player r
 - Log in with administrator credentials
 - Create, edit, delete, and change the status of tournaments
 - View the complete list of enrolled players per tournament
-- Access the statistics dashboard (Chart.js)
+- Remove/disqualify players from tournaments
+- Generate match brackets automatically
+- Report match results
+- Access the statistics dashboard (Chart.js) with activity timeline, game popularity, and top players
 - View the system activity log
+- View tournament results with standings and bracket view
 
 ### 4.2 Player / Participant (`player`)
 Registered user who participates in tournaments.
@@ -174,7 +184,11 @@ Registered user who participates in tournaments.
 - Browse the video game catalog (carousel)
 - View available tournaments and their details
 - Enroll in or cancel enrollment from open tournaments
-- View their profile and tournaments they are participating in
+- View their profile with win/loss stats and match history
+- View global and per-tournament leaderboards
+- Receive real-time notifications for match assignments, results, and registration changes
+- View tournament results with standings and brackets
+- View their matches and bracket progression
 
 > Roles are managed through the **ROLES** table in the database, linked to **USERS** via `role_id`. ENUM is not used directly in the users table.
 
@@ -232,8 +246,8 @@ Registered user who participates in tournaments.
 
 | ID    | Requirement                                                                                                                                      | Priority |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
-| RF-23 | The admin panel must display system metrics: total tournaments, active tournaments, finished tournaments, total players, and average prize pool. | High     |
-| RF-24 | Statistics must be visualized through dynamic charts using **Chart.js**.                                                                         | High     |
+| RF-23 | The admin panel must display system metrics: total tournaments, active/pending/finished tournaments, total users (admins/players), total matches (completed/pending), and total registrations. | High     |
+| RF-24 | Statistics must be visualized through dynamic charts using **Chart.js**, including an activity timeline (30 days), game popularity bar chart, and top 10 players table. | High     |
 | RF-25 | Charts must be responsive and adapt to dark mode.                                                                                                | Medium   |
 
 ### 5.6 Activity Logging Module
@@ -243,12 +257,16 @@ Registered user who participates in tournaments.
 | RF-26 | The system must automatically log relevant events in the **ACTIVITY** table: user creation, tournament creation, enrollments, and match results. | Medium   |
 | RF-27 | Each activity record must include: the related user, affected tournament/game/match, action type, and a human-readable description.              | Medium   |
 
-### 5.7 Matches Module (In Progress)
+### 5.7 Matches Module
 
 | ID    | Requirement                                                                                             | Priority |
 | ----- | ------------------------------------------------------------------------------------------------------- | -------- |
-| RF-28 | The system must allow logging matches associated with a tournament, including two players and a winner. | Medium   |
-| RF-29 | Matches must indicate the tournament round (e.g., Quarter-finals, Semi-finals, Final).                  | Low      |
+| RF-28 | The system must allow logging matches associated with a tournament, including two players and a winner. | High     |
+| RF-29 | Matches must indicate the tournament round (e.g., Round 1, Quarter-finals, Semi-finals, Final).         | High     |
+| RF-40 | The system must auto-generate brackets by randomly pairing registered players and creating round matches.| High     |
+| RF-41 | The admin must be able to report a match result by specifying the winner.                               | High     |
+| RF-42 | The frontend must display a visual bracket tree organized by round.                                    | Medium   |
+| RF-43 | Players must be able to view their matches and results in their dashboard.                              | Medium   |
 
 ### 5.8 Password Reset Module
 
@@ -269,6 +287,44 @@ Registered user who participates in tournaments.
 | RF-37 | An authenticated admin must be able to view a list of all admin users.                                  | High     |
 | RF-38 | An authenticated admin must be able to demote another admin to a regular player role.                   | High     |
 | RF-39 | The system must prevent an admin from demoting their own account.                                       | High     |
+
+### 5.10 Player Profiles Module
+
+| ID    | Requirement                                                                                             | Priority |
+| ----- | ------------------------------------------------------------------------------------------------------- | -------- |
+| RF-44 | The system must expose a profile endpoint returning player wins, losses, win rate, total matches, and tournaments count. | High     |
+| RF-45 | The frontend must display a public profile page with player statistics and recent match history.        | Medium   |
+
+### 5.11 Leaderboards Module
+
+| ID    | Requirement                                                                                             | Priority |
+| ----- | ------------------------------------------------------------------------------------------------------- | -------- |
+| RF-46 | The system must provide a global leaderboard ranking players by wins, win rate, matches, and tournaments. | High     |
+| RF-47 | The system must provide a per-tournament leaderboard showing rankings within a specific tournament.     | Medium   |
+| RF-48 | The frontend must display top players with medal icons (gold, silver, bronze) and enable tournament filtering. | Medium   |
+
+### 5.12 Notifications Module
+
+| ID    | Requirement                                                                                             | Priority |
+| ----- | ------------------------------------------------------------------------------------------------------- | -------- |
+| RF-49 | The system must send real-time in-app notifications for match assignments, results, and registration changes. | High     |
+| RF-50 | The frontend must display a notification dropdown with unread count badge in the player panel.         | High     |
+| RF-51 | Users must be able to mark individual notifications as read or all as read.                             | Medium   |
+
+### 5.13 Registration Management Module (Admin)
+
+| ID    | Requirement                                                                                             | Priority |
+| ----- | ------------------------------------------------------------------------------------------------------- | -------- |
+| RF-52 | An authenticated admin must be able to view all registrations for a specific tournament.               | High     |
+| RF-53 | An authenticated admin must be able to remove/disqualify a player from a tournament.                   | High     |
+| RF-54 | The removed player must receive a real-time notification about the removal.                             | Medium   |
+
+### 5.14 Tournament Results Module
+
+| ID    | Requirement                                                                                             | Priority |
+| ----- | ------------------------------------------------------------------------------------------------------- | -------- |
+| RF-55 | The system must return tournament standings sorted by wins and all related match data.                  | High     |
+| RF-56 | The frontend must display standings, match list, and a toggleable bracket view on the results page.    | Medium   |
 
 ---
 
@@ -390,7 +446,19 @@ VideoGames-Tournament/
 │
 ├── backend/
 │   ├── controllers/       ← Business logic per module
+│   │   └── usersController.js
+│   │   └── tournamentsController.js
+│   │   └── gamesController.js
+│   │   └── activityController.js
+│   │   └── matchesController.js       ← New (v13)
+│   │   └── leaderboardController.js   ← New (v13)
+│   │   └── notificationController.js  ← New (v13)
+│   │   └── statsController.js         ← New (v13)
 │   ├── routes/            ← Express route definitions
+│   │   └── matchesRoutes.js           ← New (v13)
+│   │   └── leaderboardRoutes.js       ← New (v13)
+│   │   └── notificationRoutes.js      ← New (v13)
+│   │   └── statsRoutes.js             ← New (v13)
 │   ├── uploads/           ← Static files (game images)
 │   ├── utils/
 │   │   ├── authMiddleware.js
@@ -411,21 +479,28 @@ VideoGames-Tournament/
 │       │   ├── PlayersList.jsx
 │       │   ├── RegisterTournament.jsx
 │       │   ├── TournamentAutocomplete.jsx
-│       │   ├── AdminStats.jsx
-│       │   └── Modal.jsx
+│   │   ├── AdminStats.jsx
+│   │   ├── Modal.jsx
+│   │   └── BracketViewer.jsx          ← New (v13)
 │       ├── pages/         ← Main views
 │       │   ├── Home.jsx
 │       │   ├── Admin.jsx
 │       │   ├── Player.jsx
 │       │   ├── AdminLogin.jsx
 │       │   ├── UserRegister.jsx
-│       │   ├── ForgotPassword.jsx
-│       │   └── ResetPassword.jsx
+│   │   ├── ForgotPassword.jsx
+│   │   ├── ResetPassword.jsx
+│   │   ├── Profile.jsx                ← New (v13)
+│   │   ├── Leaderboards.jsx           ← New (v13)
+│   │   └── TournamentResults.jsx      ← New (v13)
 │       ├── services/      ← API communication layer
 │       │   ├── api.js
-│       │   ├── tournamentService.js
-│       │   ├── userService.js
-│       │   └── socket.js
+│   │   ├── tournamentService.js
+│   │   ├── userService.js
+│   │   ├── matchService.js            ← New (v13)
+│   │   ├── leaderboardService.js      ← New (v13)
+│   │   ├── notificationService.js     ← New (v13)
+│   │   └── socket.js
 │       ├── hooks/
 │       ├── utils/
 │       │   └── formatDate.js
@@ -435,6 +510,7 @@ VideoGames-Tournament/
 │
 ├── consults/
 │   ├── password_resets.sql
+│   ├── notifications.sql             ← New (v13)
 │   └── ...
 ├── docs/scrum/            ← Backlog and sprint details
 ├── CHANGELOG.md
@@ -468,16 +544,55 @@ VideoGames-Tournament/
 | PUT    | `/api/tournaments/:id/status` | Change tournament status        | Admin  |
 | POST   | `/api/tournaments/register`   | Enroll a player in a tournament | Player |
 
+### Matches
+| Method | Endpoint                           | Description                         | Access |
+| ------ | ---------------------------------- | ----------------------------------- | ------ |
+| GET    | `/api/matches/tournament/:id`      | Get all matches for a tournament    | Public |
+| GET    | `/api/matches/player/:userId`      | Get matches for a player            | Public |
+| POST   | `/api/matches`                     | Create a match (admin)              | Admin  |
+| PUT    | `/api/matches/:id/result`          | Report match winner                 | Admin  |
+| POST   | `/api/matches/generate/:id`        | Generate brackets automatically     | Admin  |
+
+### Leaderboards
+| Method | Endpoint                           | Description                         | Access |
+| ------ | ---------------------------------- | ----------------------------------- | ------ |
+| GET    | `/api/leaderboards`                | Global leaderboard (top 100)        | Public |
+| GET    | `/api/leaderboards/tournament/:id` | Per-tournament leaderboard          | Public |
+
+### Notifications
+| Method | Endpoint                           | Description                         | Access |
+| ------ | ---------------------------------- | ----------------------------------- | ------ |
+| GET    | `/api/notifications/:userId`       | Get user notifications              | User   |
+| PUT    | `/api/notifications/:id/read`      | Mark notification as read           | User   |
+| PUT    | `/api/notifications/read-all/:userId` | Mark all notifications as read   | User   |
+
+### Statistics
+| Method | Endpoint                           | Description                         | Access |
+| ------ | ---------------------------------- | ----------------------------------- | ------ |
+| GET    | `/api/stats`                       | Advanced system statistics          | Admin  |
+
+### Tournaments (additional)
+| Method | Endpoint                                           | Description                     | Access |
+| ------ | -------------------------------------------------- | ------------------------------- | ------ |
+| GET    | `/api/tournaments/:id/registrations`                | List tournament registrations   | Admin  |
+| DELETE | `/api/tournaments/:tid/registrations/:uid`          | Remove a player registration    | Admin  |
+| GET    | `/api/tournaments/:id/results`                      | Tournament standings + matches  | Public |
+
 ### Games
 | Method | Endpoint     | Description                     | Access |
 | ------ | ------------ | ------------------------------- | ------ |
 | GET    | `/api/games` | Retrieve the video game catalog | Public |
 
+### Users (additional)
+| Method | Endpoint                    | Description                       | Access |
+| ------ | --------------------------- | --------------------------------- | ------ |
+| GET    | `/api/users/profile/:userId`| Get player profile with stats     | Public |
+
 ---
 
 ## 11. Database Model
 
-The system contains **8 relational tables** in MySQL, designed in Third Normal Form (3NF).
+The system contains **9 relational tables** in MySQL, designed in Third Normal Form (3NF).
 
 ### ROLES
 | Field       | Type         | Constraint         | Description                                    |
@@ -548,6 +663,17 @@ The system contains **8 relational tables** in MySQL, designed in Third Normal F
 | winner_id     | INT         | FK → USERS.id, NULL           | Winning player (null if no result yet)      |
 | round         | VARCHAR(50) | NOT NULL                      | Tournament round (Quarter-finals, Final, …) |
 
+### NOTIFICATIONS
+| Field      | Type         | Constraint                          | Description                              |
+| ---------- | ------------ | ----------------------------------- | ---------------------------------------- |
+| id         | INT          | PK, AUTO_INCREMENT                  | Unique notification identifier           |
+| user_id    | INT          | FK → USERS.id, NOT NULL             | Recipient user                           |
+| message    | VARCHAR(255) | NOT NULL                            | Notification message text                |
+| type       | VARCHAR(50)  | NOT NULL                            | Notification type (match, registration…) |
+| related_id | INT          | NULL                                | Related entity ID (match, tournament…)   |
+| is_read    | BOOLEAN      | NOT NULL, DEFAULT FALSE             | Read status                              |
+| created_at | DATETIME     | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Creation timestamp                       |
+
 ### ACTIVITY
 | Field         | Type         | Constraint                          | Description                                          |
 | ------------- | ------------ | ----------------------------------- | ---------------------------------------------------- |
@@ -562,20 +688,21 @@ The system contains **8 relational tables** in MySQL, designed in Third Normal F
 
 ### Relationship Summary
 
-| Parent Table | Child Table  | Cardinality | Description                                        |
-| ------------ | ------------ | :---------: | -------------------------------------------------- |
-| ROLES        | USERS        |    1 : N    | A role can be assigned to many users               |
-| STATUS       | TOURNAMENTS  |    1 : N    | A status can be applied to multiple tournaments    |
-| GAMES        | TOURNAMENTS  |    1 : N    | A game can have multiple associated tournaments    |
-| USERS        | TOURNAMENTS  |    1 : N    | A user (admin) can create multiple tournaments     |
-| USERS        | REGISTRATION |    1 : N    | A player can register for multiple tournaments     |
-| TOURNAMENTS  | REGISTRATION |    1 : N    | A tournament accepts multiple player registrations |
-| USERS        | TOURNAMENTS  |    N : M    | N:M relationship implemented through REGISTRATION  |
-| TOURNAMENTS  | MATCHES      |    1 : N    | A tournament organizes multiple matches            |
-| USERS        | MATCHES      |    1 : N    | Users participate as players in matches            |
-| MATCHES      | ACTIVITY     |    1 : N    | Matches may generate activity records              |
-| GAMES        | ACTIVITY     |    1 : N    | Games may be referenced in activity logs           |
-| TOURNAMENTS  | ACTIVITY     |    1 : N    | Tournament events may generate activity records    |
+| Parent Table | Child Table    | Cardinality | Description                                        |
+| ------------ | -------------- | :---------: | -------------------------------------------------- |
+| ROLES        | USERS          |    1 : N    | A role can be assigned to many users               |
+| STATUS       | TOURNAMENTS    |    1 : N    | A status can be applied to multiple tournaments    |
+| GAMES        | TOURNAMENTS    |    1 : N    | A game can have multiple associated tournaments    |
+| USERS        | TOURNAMENTS    |    1 : N    | A user (admin) can create multiple tournaments     |
+| USERS        | REGISTRATION   |    1 : N    | A player can register for multiple tournaments     |
+| TOURNAMENTS  | REGISTRATION   |    1 : N    | A tournament accepts multiple player registrations |
+| USERS        | TOURNAMENTS    |    N : M    | N:M relationship implemented through REGISTRATION  |
+| TOURNAMENTS  | MATCHES        |    1 : N    | A tournament organizes multiple matches            |
+| USERS        | MATCHES        |    1 : N    | Users participate as players in matches            |
+| USERS        | NOTIFICATIONS  |    1 : N    | Users receive multiple notifications               |
+| MATCHES      | ACTIVITY       |    1 : N    | Matches may generate activity records              |
+| GAMES        | ACTIVITY       |    1 : N    | Games may be referenced in activity logs           |
+| TOURNAMENTS  | ACTIVITY       |    1 : N    | Tournament events may generate activity records    |
 
 ---
 
@@ -588,6 +715,7 @@ erDiagram
     USERS ||--o{ MATCHES : participates
     USERS ||--o{ MATCHES : winner_of
     USERS ||--o{ ACTIVITY : generates
+    USERS ||--o{ NOTIFICATIONS : receives
 
     GAMES ||--o{ TOURNAMENTS : used_in
 
@@ -643,6 +771,15 @@ erDiagram
         int winner_id FK
         varchar round
     }
+    NOTIFICATIONS {
+        int id PK
+        int user_id FK
+        varchar message
+        varchar type
+        int related_id
+        boolean is_read
+        datetime created_at
+    }
     ACTIVITY {
         int id PK
         int user_id FK
@@ -680,31 +817,37 @@ The project follows an **adapted Scrum methodology**, organized into 6 sprints:
 | 4      | v0.9.5 – v9.8.0  | Apr 22 – May 5, 2026 | Tournament management, enrollment, Chart.js statistics, full integration       |
 | 5      | v10.0.0 – v11.0.0| Jun 4, 2026          | JWT authentication, real-time Socket.io, tournament search & edit              |
 | 6      | v12.0.0          | Jun 6–7, 2026        | Cyber Neon redesign, animated background, password reset, admin management     |
+| 7      | v13.0.0          | Jun 8, 2026          | Match brackets, player profiles, leaderboards, notifications, admin registration management, advanced statistics, tournament results |
 
-### Current Status (v12.0.0 — June 7, 2026)
+### Current Status (v13.0.0 — June 8, 2026)
 
 **Implemented:**
 - JWT token-based authentication with role-based authorization
 - Server-side route protection via auth middleware
 - Environment variable configuration (`.env`) for credentials and JWT secret
-- FOREIGN KEY constraints on all 8 database tables
+- FOREIGN KEY constraints on all 8 database tables (+ new `notifications` table)
 - Centralized Axios service with automatic JWT attachment
-- Real-time updates via Socket.io (tournament CRUD, player registration)
-- Complete flow: Register → Login → Browse games → Enroll → Admin panel
+- Real-time updates via Socket.io (tournament CRUD, player registration, match events, notifications)
+- Complete flow: Register → Login → Browse games → Enroll → Matches → Results
 - Player tournament enrollment with autocomplete search
-- Dynamic admin statistics (Chart.js)
-- Metrics: total tournaments, active, finished, total players, average prize pool
+- Dynamic admin statistics (Chart.js) with activity timeline, game popularity, top players
+- Metrics: total tournaments, active, pending, finished, users, matches, registrations
 - Cyber Neon visual redesign with dark gaming theme
 - Animated Canvas particle background
 - Password reset via email (Nodemailer + crypto tokens)
 - Admin management (create, list, demote to user)
+- **Match & Bracket system** — automatic bracket generation, round progression, result reporting
+- **Player profiles** — win/loss stats, win rate, match history
+- **Leaderboards** — global and per-tournament rankings with medals
+- **Notifications** — real-time in-app notifications with unread badge
+- **Admin registration management** — view/remove player registrations
+- **Tournament results** — standings, match list, bracket view
+- **Advanced statistics** — 30-day activity line chart, game popularity bar chart, top 10 players
 
 **In Progress:**
-- Tournament status management (finish / cancel tournaments)
-- Player participation analytics per tournament
-- Advanced statistics with time-based activity tracking
-- Admin controls for registrations
-- Bracket/match generation and management
+- Player participation analytics per tournament (advanced)
+- System-wide search functionality
+- Email notifications for match assignments
 
 ---
 
@@ -732,7 +875,8 @@ The project follows an **adapted Scrum methodology**, organized into 6 sprints:
 | Tournament   | Organized competition between players for a specific video game                 |
 | Registration | Formal enrollment of a player in an available tournament                        |
 | Match        | Direct encounter between two players within a tournament                        |
-| Bracket      | Head-to-head elimination chart (out of scope for v1)                            |
+| Bracket      | Head-to-head elimination chart organized by round                        |
+| Notification | Real-time in-app alert for match assignments, results, and registration changes |
 | Status       | Current phase of a tournament managed through the STATUS table                  |
 | Prize Pool   | Total monetary prize amount for a tournament                                    |
 | JWT          | Digitally signed token used to authenticate API requests                        |
@@ -746,5 +890,5 @@ The project follows an **adapted Scrum methodology**, organized into 6 sprints:
 
 ---
 
-*Document generated for the eSports Tournament Database System project — v10.0.0*  
+*Document generated for the eSports Tournament Database System project — v13.0.0*  
 *Development team: DGETI — 2026*

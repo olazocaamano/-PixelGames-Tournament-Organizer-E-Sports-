@@ -236,7 +236,71 @@ exports.login = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Database error' });
+        res.status(500).json({ error: err.message });
+    }
+};
+
+/* Get player profile with stats */
+exports.getPlayerProfile = async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const [users] = await db.query(
+            `SELECT id, username, nickname, email, is_active FROM users WHERE id = ? AND role_id = 3`,
+            [userId]
+        );
+        if (users.length === 0) {
+            return res.status(404).json({ error: "Player not found" });
+        }
+
+        const [wins] = await db.query(
+            `SELECT COUNT(*) AS total FROM matches WHERE winner_id = ?`,
+            [userId]
+        );
+
+        const [losses] = await db.query(
+            `SELECT COUNT(*) AS total FROM matches WHERE (player_1_id = ? OR player_2_id = ?) AND winner_id IS NOT NULL AND winner_id != ?`,
+            [userId, userId, userId]
+        );
+
+        const [matches] = await db.query(
+            `SELECT COUNT(*) AS total FROM matches WHERE (player_1_id = ? OR player_2_id = ?)`,
+            [userId, userId]
+        );
+
+        const [tournaments] = await db.query(
+            `SELECT COUNT(*) AS total FROM registration WHERE user_id = ?`,
+            [userId]
+        );
+
+        const [recentMatches] = await db.query(`
+            SELECT m.id, m.round, m.winner_id, t.name AS tournament_name,
+                   p1.nickname AS player_1_nickname, p2.nickname AS player_2_nickname
+            FROM matches m
+            JOIN tournaments t ON m.tournament_id = t.id
+            LEFT JOIN users p1 ON m.player_1_id = p1.id
+            LEFT JOIN users p2 ON m.player_2_id = p2.id
+            WHERE m.player_1_id = ? OR m.player_2_id = ?
+            ORDER BY m.id DESC LIMIT 20
+        `, [userId, userId]);
+
+        const winRate = matches.total > 0
+            ? Math.round((wins.total / matches.total) * 100)
+            : 0;
+
+        res.json({
+            profile: users[0],
+            stats: {
+                wins: wins.total,
+                losses: losses.total,
+                total_matches: matches.total,
+                win_rate: winRate,
+                tournaments_played: tournaments.total
+            },
+            recent_matches: recentMatches
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Database error" });
     }
 };
 

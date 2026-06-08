@@ -16,4 +16,10 @@ router.get("/my-registrations/:user_id", authenticate, controller.getMyTournamen
 
 router.put("/:id/status", authenticate, authorize('admin'), controller.updateTournamentStatus);
 
+router.get("/:id/registrations", authenticate, authorize('admin'), controller.getTournamentRegistrations);
+
+router.delete("/:tournamentId/registrations/:userId", authenticate, authorize('admin'), controller.removeRegistration);
+
+router.get("/:id/results", controller.getTournamentResults);
+
 module.exports = router;

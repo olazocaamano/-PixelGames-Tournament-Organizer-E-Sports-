@@ -1,7 +1,7 @@
 # 🎮 eSports Tournament Database System
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v12.0.0-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/version-v13.0.0-blue?style=for-the-badge" />
   <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge" />
   <img src="https://img.shields.io/badge/license-academic-orange?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react" />
@@ -93,6 +93,13 @@ The system was developed following modern software engineering practices, combin
 ✅ Animated Particle Background  
 ✅ Cyber Neon Gaming Theme  
 ✅ Responsive Design for Multiple Devices  
+✅ Match & Bracket Management (Auto-generate, Report Results)  
+✅ Player Profiles with Win/Loss Stats  
+✅ Global & Per-Tournament Leaderboards  
+✅ In-App Notifications (Real-time)  
+✅ Admin Registration Management  
+✅ Tournament Results & Standings  
+✅ Advanced Statistics (Activity Timeline, Game Popularity, Top Players)  
 
 ---
 
@@ -119,7 +126,15 @@ VideoGames-Tournament/
 │   │   └── tournamentsController.js
 │   │   └── gamesController.js
 │   │   └── activityController.js
+│   │   └── matchesController.js
+│   │   └── leaderboardController.js
+│   │   └── notificationController.js
+│   │   └── statsController.js
 │   ├── routes/
+│   │   └── matchesRoutes.js
+│   │   └── leaderboardRoutes.js
+│   │   └── notificationRoutes.js
+│   │   └── statsRoutes.js
 │   ├── uploads/
 │   ├── utils/
 │   │   ├── authMiddleware.js
@@ -140,21 +155,28 @@ VideoGames-Tournament/
 │       │   ├── PlayersList.jsx
 │       │   ├── RegisterTournament.jsx
 │       │   ├── TournamentAutocomplete.jsx
-│       │   ├── AdminStats.jsx
-│       │   └── Modal.jsx
+│   │   ├── AdminStats.jsx
+│   │   ├── Modal.jsx
+│   │   └── BracketViewer.jsx
 │       ├── pages/
 │       │   ├── Home.jsx
 │       │   ├── Admin.jsx
 │       │   ├── Player.jsx
 │       │   ├── AdminLogin.jsx
 │       │   ├── UserRegister.jsx
-│       │   ├── ForgotPassword.jsx
-│       │   └── ResetPassword.jsx
+│   │   ├── ForgotPassword.jsx
+│   │   ├── ResetPassword.jsx
+│   │   ├── Profile.jsx
+│   │   ├── Leaderboards.jsx
+│   │   └── TournamentResults.jsx
 │       ├── services/
 │       │   ├── api.js
 │       │   ├── userService.js
-│       │   ├── tournamentService.js
-│       │   └── socket.js
+│   │   ├── tournamentService.js
+│   │   ├── matchService.js
+│   │   ├── leaderboardService.js
+│   │   ├── notificationService.js
+│   │   └── socket.js
 │       ├── utils/
 │       │   └── formatDate.js
 │       ├── resources/
@@ -163,6 +185,7 @@ VideoGames-Tournament/
 │
 ├── consults/
 │   ├── password_resets.sql
+│   ├── notifications.sql
 │   └── ...
 ├── docs/
 │   ├── SRS.md
@@ -337,11 +360,39 @@ npm run dev
 
 ## 🏆 Tournament Management
 
-- Create tournaments
-- Edit tournaments
-- Delete tournaments
-- Tournament registration system
-- Match organization
+- Create, edit, delete tournaments
+- Tournament registration system with autocomplete
+- Match organization with automatic bracket generation
+- Round progression (Round 1 → Quarter-finals → Semi-finals → Final)
+- Report match results with winner validation
+- Visual bracket viewer for tournament progression
+
+---
+
+## 👤 Player Profiles
+
+- Public profile pages with player statistics
+- Win/Loss tracking and win rate calculation
+- Total matches and tournaments played
+- Recent match history with results
+
+---
+
+## 🏅 Leaderboards
+
+- Global rankings (wins, matches, win rate, tournaments)
+- Per-tournament leaderboards
+- Medal icons (gold, silver, bronze) for top 3
+- Filterable by tournament
+
+---
+
+## 🔔 Notifications System
+
+- Real-time in-app notifications via Socket.io
+- Match assignment, win/loss, and registration notifications
+- Unread badge indicator in player panel
+- "Mark all as read" action
 
 ---
 
@@ -454,7 +505,7 @@ Artificial Intelligence tools were used to assist in:
 
 # 📌 Current Version
 
-> Latest Stable Version: **v12.0.0**
+> Latest Stable Version: **v13.0.0**
 
 📄 Full version history available in:
 

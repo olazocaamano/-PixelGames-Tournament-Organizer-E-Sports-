@@ -124,6 +124,28 @@ Stores password reset tokens generated for users who request a password reset.
 
 ---
 
+## Table: NOTIFICATIONS
+
+Stores in-app notifications sent to users for match assignments, results, and registration changes.
+
+| Field          | Type         | Constraint                          | Description                                          |
+| :------------- | :----------- | :---------------------------------- | :--------------------------------------------------- |
+| **id**         | INT          | PK, Auto-increment                  | Unique identifier for the notification.              |
+| **user_id**    | INT          | FK (USERS.id), Not Null             | ID of the user who will receive the notification.    |
+| **message**    | VARCHAR(255) | Not Null                            | Notification text displayed to the user.             |
+| **type**       | VARCHAR(50)  | Not Null                            | Notification category (e.g., 'match', 'registration').|
+| **related_id** | INT          | Nullable                            | ID of the related entity (match, tournament, etc.).  |
+| **is_read**    | BOOLEAN      | Not Null, Default FALSE             | Indicates if the notification has been read.         |
+| **created_at** | DATETIME     | Not Null, Default CURRENT_TIMESTAMP | Date and time when the notification was created.     |
+
+### Additional Constraint
+
+| Constraint                    | Description                                        |
+| ----------------------------- | -------------------------------------------------- |
+| **FOREIGN KEY (user_id)**     | Ensures referential integrity with the USERS table.|
+
+---
+
 ## Table: STATUS
 
 Stores the possible status values that can be assigned to tournaments.
@@ -151,17 +173,18 @@ Stores the possible status values that can be assigned to tournaments.
 
 The following table summarizes the main relationships between entities in the database.
 
-| Parent Table | Child Table    | Relationship | Description                                                                                                                                                   |
-| ------------ | -------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ROLES        | USERS          | 1 : N        | A role can be assigned to many users.                                                                                                                         |
-| STATUS       | TOURNAMENTS    | 1 : N        | A status can be applied to multiple tournaments.                                                                                                              |
-| GAMES        | TOURNAMENTS    | 1 : N        | A game can have multiple tournaments associated with it.                                                                                                      |
-| USERS        | REGISTRATION   | 1 : N        | A user can register for multiple tournaments.                                                                                                                 |
-| USERS        | PASSWORD_RESETS| 1 : N        | A user can request multiple password resets.                                                                                                                  |
-| TOURNAMENTS  | REGISTRATION   | 1 : N        | A tournament can accept multiple player registrations.                                                                                                        |
-| USERS        | TOURNAMENTS    | N : M        | A user can participate in multiple tournaments and a tournament can have multiple users. This relationship is implemented through the **REGISTRATION** table. |
-| TOURNAMENTS  | MATCHES        | 1 : N        | A tournament organizes multiple matches.                                                                                                                      |
-| USERS        | MATCHES        | 1 : N        | Users participate in matches as players.                                                                                                                      |
-| MATCHES      | ACTIVITY       | 1 : N        | Matches may generate activity records.                                                                                                                        |
-| GAMES        | ACTIVITY       | 1 : N        | Games may be referenced in activity logs.                                                                                                                     |
-| TOURNAMENTS  | ACTIVITY       | 1 : N        | Tournament events may generate activity records.                                                                                                              |
+| Parent Table | Child Table     | Relationship | Description                                                                                                                                                   |
+| ------------ | --------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ROLES        | USERS           | 1 : N        | A role can be assigned to many users.                                                                                                                         |
+| STATUS       | TOURNAMENTS     | 1 : N        | A status can be applied to multiple tournaments.                                                                                                              |
+| GAMES        | TOURNAMENTS     | 1 : N        | A game can have multiple tournaments associated with it.                                                                                                      |
+| USERS        | REGISTRATION    | 1 : N        | A user can register for multiple tournaments.                                                                                                                 |
+| USERS        | PASSWORD_RESETS | 1 : N        | A user can request multiple password resets.                                                                                                                  |
+| USERS        | NOTIFICATIONS   | 1 : N        | A user can receive multiple notifications.                                                                                                                    |
+| TOURNAMENTS  | REGISTRATION    | 1 : N        | A tournament can accept multiple player registrations.                                                                                                        |
+| USERS        | TOURNAMENTS     | N : M        | A user can participate in multiple tournaments and a tournament can have multiple users. This relationship is implemented through the **REGISTRATION** table. |
+| TOURNAMENTS  | MATCHES         | 1 : N        | A tournament organizes multiple matches.                                                                                                                      |
+| USERS        | MATCHES         | 1 : N        | Users participate in matches as players.                                                                                                                      |
+| MATCHES      | ACTIVITY        | 1 : N        | Matches may generate activity records.                                                                                                                        |
+| GAMES        | ACTIVITY        | 1 : N        | Games may be referenced in activity logs.                                                                                                                     |
+| TOURNAMENTS  | ACTIVITY        | 1 : N        | Tournament events may generate activity records.                                                                                                              |

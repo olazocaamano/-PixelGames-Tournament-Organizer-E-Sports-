@@ -10,6 +10,10 @@ const gamesRoutes = require('./routes/gamesRoutes');
 const usersRoutes = require('./routes/usersRoutes');
 const tournamentsRoutes = require('./routes/tournamentsRoutes');
 const activityRoutes = require('./routes/activityRoutes');
+const matchesRoutes = require('./routes/matchesRoutes');
+const leaderboardsRoutes = require('./routes/leaderboardsRoutes');
+const notificationsRoutes = require('./routes/notificationsRoutes');
+const statsRoutes = require('./routes/statsRoutes');
 
 const { setIO } = require('./utils/socketEmitter');
 
@@ -51,6 +55,10 @@ app.use('/api/games', gamesRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/tournaments', tournamentsRoutes);
 app.use('/api/activity', activityRoutes);
+app.use('/api/matches', matchesRoutes);
+app.use('/api/leaderboards', leaderboardsRoutes);
+app.use('/api/notifications', notificationsRoutes);
+app.use('/api/stats', statsRoutes);
 
 //Test route to see if the server is live
 app.get('/', (req, res) => {

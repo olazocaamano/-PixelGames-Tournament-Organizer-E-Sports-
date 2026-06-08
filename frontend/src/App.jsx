@@ -16,6 +16,9 @@ import AdminLogin from "./pages/AdminLogin";
 import UserRegister from "./pages/UserRegister";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
+import Leaderboards from "./pages/Leaderboards";
+import TournamentResults from "./pages/TournamentResults";
 
 // Components
 import BackgroundAnimation from "./components/BackgroundAnimation";
@@ -40,6 +43,9 @@ function App() {
           <Route path="/player" element={<Player />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/profile/:userId" element={<Profile />} />
+          <Route path="/leaderboards" element={<Leaderboards />} />
+          <Route path="/tournament/:id/results" element={<TournamentResults />} />
         </Routes>
       </div>
     </>
