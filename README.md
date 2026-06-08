@@ -1,7 +1,7 @@
 # 🎮 eSports Tournament Database System
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v10.0.0-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/version-v12.0.0-blue?style=for-the-badge" />
   <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge" />
   <img src="https://img.shields.io/badge/license-academic-orange?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react" />
@@ -88,6 +88,10 @@ The system was developed following modern software engineering practices, combin
 ✅ Role-Based Access Control  
 ✅ REST API Integration  
 ✅ Dynamic Game Carousel  
+✅ Password Reset via Email  
+✅ Admin Management (Create / List / Demote)  
+✅ Animated Particle Background  
+✅ Cyber Neon Gaming Theme  
 ✅ Responsive Design for Multiple Devices  
 
 ---
@@ -111,24 +115,58 @@ VideoGames-Tournament/
 │
 ├── backend/
 │   ├── controllers/
+│   │   └── usersController.js
+│   │   └── tournamentsController.js
+│   │   └── gamesController.js
+│   │   └── activityController.js
 │   ├── routes/
 │   ├── uploads/
 │   ├── utils/
+│   │   ├── authMiddleware.js
+│   │   ├── activityLogger.js
+│   │   ├── socketEmitter.js
+│   │   └── emailService.js
 │   ├── db.js
 │   └── index.js
 │
 ├── frontend/
 │   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── resources/
-│   │   ├── services/
-│   │   ├── utils/
-│   │
-│   ├── App.jsx
-│   └── main.jsx
+│   └── src/
+│       ├── components/
+│       │   ├── BackgroundAnimation.jsx
+│       │   ├── CreateTournament.jsx
+│       │   ├── TournamentList.jsx
+│       │   ├── ActivityList.jsx
+│       │   ├── PlayersList.jsx
+│       │   ├── RegisterTournament.jsx
+│       │   ├── TournamentAutocomplete.jsx
+│       │   ├── AdminStats.jsx
+│       │   └── Modal.jsx
+│       ├── pages/
+│       │   ├── Home.jsx
+│       │   ├── Admin.jsx
+│       │   ├── Player.jsx
+│       │   ├── AdminLogin.jsx
+│       │   ├── UserRegister.jsx
+│       │   ├── ForgotPassword.jsx
+│       │   └── ResetPassword.jsx
+│       ├── services/
+│       │   ├── api.js
+│       │   ├── userService.js
+│       │   ├── tournamentService.js
+│       │   └── socket.js
+│       ├── utils/
+│       │   └── formatDate.js
+│       ├── resources/
+│       ├── App.jsx
+│       └── index.js
 │
+├── consults/
+│   ├── password_resets.sql
+│   └── ...
+├── docs/
+│   ├── SRS.md
+│   └── scrum/
 ├── CHANGELOG.md
 ├── README.md
 └── package.json
@@ -172,6 +210,15 @@ DB_PASSWORD=yourpassword
 DB_NAME=esports_tournaments
 JWT_SECRET=your_secret_key
 JWT_EXPIRES_IN=24h
+
+# SMTP (optional — without it, uses Ethereal test emails)
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_SECURE=false
+# SMTP_USER=your-email@gmail.com
+# SMTP_PASS=your-app-password
+
+FRONTEND_URL=http://localhost:3000
 ```
 
 ## Run backend server
@@ -227,6 +274,7 @@ npm run dev
 - react-chartjs-2
 - CSS3
 - JavaScript (ES6+)
+- Canvas API
 
 ---
 
@@ -239,6 +287,8 @@ npm run dev
 - dotenv
 - CORS
 - jsonwebtoken
+- Nodemailer
+- Socket.io
 
 ---
 
@@ -404,7 +454,7 @@ Artificial Intelligence tools were used to assist in:
 
 # 📌 Current Version
 
-> Latest Stable Version: **v10.0.0**
+> Latest Stable Version: **v12.0.0**
 
 📄 Full version history available in:
 

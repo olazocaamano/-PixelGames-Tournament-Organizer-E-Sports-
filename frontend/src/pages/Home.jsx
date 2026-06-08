@@ -180,7 +180,7 @@ function Home() {
                                 <div className="resetPass">
                                     <p>
                                         Forgot your password?{" "}
-                                        <Link to="/reset">Reset</Link>
+                                        <Link to="/forgot-password">Reset</Link>
                                     </p>
                                 </div>
 

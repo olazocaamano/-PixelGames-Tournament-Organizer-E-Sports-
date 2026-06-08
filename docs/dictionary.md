@@ -97,9 +97,30 @@ Stores system event logs such as new users, new tournaments, added games, regist
 | **tournament_id** | INT          | FK (TOURNAMENTS.id), Nullable       | Related tournament, if applicable.                                             |
 | **game_id**       | INT          | FK (GAMES.id), Nullable             | Related game, if applicable.                                                   |
 | **match_id**      | INT          | FK (MATCHES.id), Nullable           | Related match, if applicable.                                                  |
-| **action_type**   | VARCHAR(50)  | Not Null                            | Type of action (e.g., CREATE_USER, CREATE_TOURNAMENT, REGISTER, CREATE_MATCH). |
+| **action_type**   | VARCHAR(50)  | Not Null                            | Type of action (e.g., CREATE_USER, CREATE_TOURNAMENT, REGISTER, CREATE_MATCH, NEW_ADMIN, ADMIN_DEMOTED, PASSWORD_RESET_REQUESTED, PASSWORD_RESET_COMPLETED). |
 | **description**   | VARCHAR(255) | Not Null                            | Human-readable message displayed in the frontend.                              |
 | **created_at**    | DATETIME     | Not Null, Default CURRENT_TIMESTAMP | Date and time when the activity occurred.                                      |
+
+---
+
+## Table: PASSWORD_RESETS
+
+Stores password reset tokens generated for users who request a password reset.
+
+| Field          | Type         | Constraint              | Description                                                 |
+| :------------- | :----------- | :---------------------- | :---------------------------------------------------------- |
+| **id**         | INT          | PK, Auto-increment      | Unique identifier for the reset record.                     |
+| **user_id**    | INT          | FK (USERS.id), Not Null | User who requested the password reset.                      |
+| **token**      | VARCHAR(255) | Not Null                | Cryptographically secure reset token (64 hex characters).   |
+| **expires_at** | DATETIME     | Not Null                | Date and time when the token expires (1 hour from creation).|
+| **used_at**    | DATETIME     | Nullable                | Date and time when the token was used (null if still valid).|
+| **created_at** | DATETIME     | Default CURRENT_TIMESTAMP | Date and time when the record was created.                |
+
+### Additional Constraint
+
+| Constraint                    | Description                                        |
+| ----------------------------- | -------------------------------------------------- |
+| **FOREIGN KEY (user_id)**     | Ensures referential integrity with the USERS table.|
 
 ---
 
@@ -130,16 +151,17 @@ Stores the possible status values that can be assigned to tournaments.
 
 The following table summarizes the main relationships between entities in the database.
 
-| Parent Table | Child Table  | Relationship | Description                                                                                                                                                   |
-| ------------ | ------------ | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ROLES        | USERS        | 1 : N        | A role can be assigned to many users.                                                                                                                         |
-| STATUS       | TOURNAMENTS  | 1 : N        | A status can be applied to multiple tournaments.                                                                                                              |
-| GAMES        | TOURNAMENTS  | 1 : N        | A game can have multiple tournaments associated with it.                                                                                                      |
-| USERS        | REGISTRATION | 1 : N        | A user can register for multiple tournaments.                                                                                                                 |
-| TOURNAMENTS  | REGISTRATION | 1 : N        | A tournament can accept multiple player registrations.                                                                                                        |
-| USERS        | TOURNAMENTS  | N : M        | A user can participate in multiple tournaments and a tournament can have multiple users. This relationship is implemented through the **REGISTRATION** table. |
-| TOURNAMENTS  | MATCHES      | 1 : N        | A tournament organizes multiple matches.                                                                                                                      |
-| USERS        | MATCHES      | 1 : N        | Users participate in matches as players.                                                                                                                      |
-| MATCHES      | ACTIVITY     | 1 : N        | Matches may generate activity records.                                                                                                                        |
-| GAMES        | ACTIVITY     | 1 : N        | Games may be referenced in activity logs.                                                                                                                     |
-| TOURNAMENTS  | ACTIVITY     | 1 : N        | Tournament events may generate activity records.                                                                                                              |
+| Parent Table | Child Table    | Relationship | Description                                                                                                                                                   |
+| ------------ | -------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ROLES        | USERS          | 1 : N        | A role can be assigned to many users.                                                                                                                         |
+| STATUS       | TOURNAMENTS    | 1 : N        | A status can be applied to multiple tournaments.                                                                                                              |
+| GAMES        | TOURNAMENTS    | 1 : N        | A game can have multiple tournaments associated with it.                                                                                                      |
+| USERS        | REGISTRATION   | 1 : N        | A user can register for multiple tournaments.                                                                                                                 |
+| USERS        | PASSWORD_RESETS| 1 : N        | A user can request multiple password resets.                                                                                                                  |
+| TOURNAMENTS  | REGISTRATION   | 1 : N        | A tournament can accept multiple player registrations.                                                                                                        |
+| USERS        | TOURNAMENTS    | N : M        | A user can participate in multiple tournaments and a tournament can have multiple users. This relationship is implemented through the **REGISTRATION** table. |
+| TOURNAMENTS  | MATCHES        | 1 : N        | A tournament organizes multiple matches.                                                                                                                      |
+| USERS        | MATCHES        | 1 : N        | Users participate in matches as players.                                                                                                                      |
+| MATCHES      | ACTIVITY       | 1 : N        | Matches may generate activity records.                                                                                                                        |
+| GAMES        | ACTIVITY       | 1 : N        | Games may be referenced in activity logs.                                                                                                                     |
+| TOURNAMENTS  | ACTIVITY       | 1 : N        | Tournament events may generate activity records.                                                                                                              |

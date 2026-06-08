@@ -2,6 +2,8 @@ const db = require('../db');
 const logActivity = require("../utils/activityLogger");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { sendPasswordResetEmail } = require('../utils/emailService');
 
 /* Get all users */
 exports.getUsers = async (req, res) => {
@@ -14,6 +16,106 @@ exports.getUsers = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
+    }
+};
+
+/* Forgot password - send reset email */
+exports.forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+    }
+
+    try {
+        const [users] = await db.query(
+            'SELECT id, username FROM users WHERE email = ?',
+            [email]
+        );
+
+        if (users.length === 0) {
+            return res.json({ message: 'If the email exists, a reset link has been sent.' });
+        }
+
+        const user = users[0];
+
+        const [existing] = await db.query(
+            'SELECT id FROM password_resets WHERE user_id = ? AND used_at IS NULL AND expires_at > NOW()',
+            [user.id]
+        );
+
+        if (existing.length > 0) {
+            await db.query('UPDATE password_resets SET used_at = NOW() WHERE user_id = ? AND used_at IS NULL', [user.id]);
+        }
+
+        const token = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+        await db.query(
+            'INSERT INTO password_resets (user_id, token, expires_at) VALUES (?, ?, ?)',
+            [user.id, token, expiresAt]
+        );
+
+        const result = await sendPasswordResetEmail(email, token);
+
+        await logActivity({
+            user_id: user.id,
+            action_type: "PASSWORD_RESET_REQUESTED",
+            description: `Password reset requested for user: ${user.username}`
+        });
+
+        res.json({
+            message: 'If the email exists, a reset link has been sent.',
+            ...(result.previewUrl ? { previewUrl: result.previewUrl } : {})
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+/* Reset password with token */
+exports.resetPassword = async (req, res) => {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+        return res.status(400).json({ error: 'Token and new password are required' });
+    }
+
+    if (password.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    try {
+        const [tokens] = await db.query(
+            'SELECT pr.user_id, u.username FROM password_resets pr INNER JOIN users u ON pr.user_id = u.id WHERE pr.token = ? AND pr.used_at IS NULL AND pr.expires_at > NOW()',
+            [token]
+        );
+
+        if (tokens.length === 0) {
+            return res.status(400).json({ error: 'Invalid or expired reset token' });
+        }
+
+        const { user_id, username } = tokens[0];
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        await db.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, user_id]);
+
+        await db.query('UPDATE password_resets SET used_at = NOW() WHERE token = ?', [token]);
+
+        await logActivity({
+            user_id,
+            action_type: "PASSWORD_RESET_COMPLETED",
+            description: `Password reset completed for user: ${username}`
+        });
+
+        res.json({ message: 'Password has been reset successfully.' });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
     }
 };
 
@@ -135,6 +237,107 @@ exports.login = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Database error' });
+    }
+};
+
+/* Create admin user (admin only) */
+exports.createAdmin = async (req, res) => {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    if (password.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    try {
+        const [existingUser] = await db.query(
+            'SELECT id FROM users WHERE username = ? OR email = ?',
+            [username, email]
+        );
+
+        if (existingUser.length > 0) {
+            return res.status(400).json({ error: 'Username or email already exists' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const nicknameValue = username;
+
+        const [result] = await db.query(
+            `INSERT INTO users (username, email, password, role_id, nickname, is_active)
+             VALUES (?, ?, ?, 1, ?, 1)`,
+            [username, email, hashedPassword, nicknameValue]
+        );
+
+        const newUserId = result.insertId;
+
+        await logActivity({
+            user_id: newUserId,
+            action_type: "NEW_ADMIN",
+            description: `New admin created: ${username} by ${req.user.username}`
+        });
+
+        res.status(201).json({ message: 'Admin created successfully' });
+
+    } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ error: 'Username or email already exists' });
+        }
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+/* Get admin users */
+exports.getAdmins = async (req, res) => {
+    try {
+        const [results] = await db.query(
+            'SELECT id, username, email, is_active FROM users WHERE role_id = 1'
+        );
+        res.json(results);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+};
+
+/* Demote admin to regular user */
+exports.demoteAdmin = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [users] = await db.query(
+            'SELECT id, username, role_id FROM users WHERE id = ?',
+            [id]
+        );
+
+        if (users.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (users[0].role_id !== 1) {
+            return res.status(400).json({ error: 'User is not an admin' });
+        }
+
+        if (Number(id) === Number(req.user.id)) {
+            return res.status(400).json({ error: 'You cannot demote yourself' });
+        }
+
+        await db.query('UPDATE users SET role_id = 3 WHERE id = ?', [id]);
+
+        await logActivity({
+            user_id: id,
+            action_type: "ADMIN_DEMOTED",
+            description: `Admin ${users[0].username} demoted to user by ${req.user.username}`
+        });
+
+        res.json({ message: 'Admin demoted to user successfully' });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
     }
 };
 

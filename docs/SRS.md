@@ -10,15 +10,15 @@
   </tr>
   <tr>
     <td><strong>Version</strong></td>
-    <td>10.0.0</td>
+    <td>12.0.0</td>
   </tr>
   <tr>
     <td><strong>Date</strong></td>
-    <td>2026-06-04</td>
+    <td>2026-06-07</td>
   </tr>
   <tr>
     <td><strong>Status</strong></td>
-    <td>In development — JWT authentication implemented, core flow stable</td>
+    <td>In development — Cyber Neon redesign, password reset & admin management implemented</td>
   </tr>
   <tr>
     <td><strong>Repository</strong></td>
@@ -71,7 +71,7 @@
 This document specifies the software requirements for the **eSports Tournament Database System**, a full-stack web application for managing competitive video game tournaments. It serves as the official technical reference for the development team throughout the entire project lifecycle.
 
 ### 1.2 Scope
-The system allows users to create, manage, and participate in video game tournaments through a web platform. The modules covered in the current version (v10.0.0) are:
+The system allows users to create, manage, and participate in video game tournaments through a web platform. The modules covered in the current version (v12.0.0) are:
 
 - Authentication and role-based access control
 - Tournament management (full CRUD)
@@ -79,6 +79,10 @@ The system allows users to create, manage, and participate in video game tournam
 - Video game catalog and carousel
 - Admin statistics dashboard
 - System activity logging
+- Real-time updates via Socket.io
+- Password reset via email
+- Admin management (create, list, demote)
+- Cyber Neon themed UI with animated background
 
 Features such as real-time brackets, advanced analytics, and notifications are **in progress** or planned for future versions.
 
@@ -246,6 +250,26 @@ Registered user who participates in tournaments.
 | RF-28 | The system must allow logging matches associated with a tournament, including two players and a winner. | Medium   |
 | RF-29 | Matches must indicate the tournament round (e.g., Quarter-finals, Semi-finals, Final).                  | Low      |
 
+### 5.8 Password Reset Module
+
+| ID    | Requirement                                                                                                                 | Priority |
+| ----- | --------------------------------------------------------------------------------------------------------------------------- | -------- |
+| RF-30 | An unauthenticated user must be able to request a password reset by providing their email address.                          | High     |
+| RF-31 | The system must generate a unique, cryptographically secure reset token with a 1-hour expiration.                           | High     |
+| RF-32 | The system must send an email containing a reset link with the token to the provided address.                               | High     |
+| RF-33 | The user must be able to set a new password using a valid reset token.                                                      | High     |
+| RF-34 | The token must be single-use and invalidated after a successful password reset.                                              | High     |
+| RF-35 | The system must not reveal whether an email address is registered (returns generic success message).                        | Medium   |
+
+### 5.9 Admin Management Module
+
+| ID    | Requirement                                                                                             | Priority |
+| ----- | ------------------------------------------------------------------------------------------------------- | -------- |
+| RF-36 | An authenticated admin must be able to create a new admin user with username, email, and password.      | High     |
+| RF-37 | An authenticated admin must be able to view a list of all admin users.                                  | High     |
+| RF-38 | An authenticated admin must be able to demote another admin to a regular player role.                   | High     |
+| RF-39 | The system must prevent an admin from demoting their own account.                                       | High     |
+
 ---
 
 ## 6. Non-Functional Requirements
@@ -368,7 +392,11 @@ VideoGames-Tournament/
 │   ├── controllers/       ← Business logic per module
 │   ├── routes/            ← Express route definitions
 │   ├── uploads/           ← Static files (game images)
-│   ├── utils/             ← Helper functions
+│   ├── utils/
+│   │   ├── authMiddleware.js
+│   │   ├── activityLogger.js
+│   │   ├── socketEmitter.js
+│   │   └── emailService.js
 │   ├── db.js              ← MySQL connection configuration
 │   └── index.js           ← Server entry point
 │
@@ -376,27 +404,38 @@ VideoGames-Tournament/
 │   ├── public/
 │   └── src/
 │       ├── components/    ← Reusable UI components
+│       │   ├── BackgroundAnimation.jsx
 │       │   ├── CreateTournament.jsx
 │       │   ├── TournamentList.jsx
 │       │   ├── ActivityList.jsx
+│       │   ├── PlayersList.jsx
+│       │   ├── RegisterTournament.jsx
+│       │   ├── TournamentAutocomplete.jsx
+│       │   ├── AdminStats.jsx
 │       │   └── Modal.jsx
 │       ├── pages/         ← Main views
 │       │   ├── Home.jsx
 │       │   ├── Admin.jsx
 │       │   ├── Player.jsx
 │       │   ├── AdminLogin.jsx
-│       │   └── UserRegister.jsx
+│       │   ├── UserRegister.jsx
+│       │   ├── ForgotPassword.jsx
+│       │   └── ResetPassword.jsx
 │       ├── services/      ← API communication layer
 │       │   ├── api.js
 │       │   ├── tournamentService.js
-│       │   └── userService.js
+│       │   ├── userService.js
+│       │   └── socket.js
 │       ├── hooks/
 │       ├── utils/
 │       │   └── formatDate.js
 │       ├── resources/     ← Images and static assets
 │       ├── App.jsx
-│       └── main.jsx
+│       └── index.js
 │
+├── consults/
+│   ├── password_resets.sql
+│   └── ...
 ├── docs/scrum/            ← Backlog and sprint details
 ├── CHANGELOG.md
 ├── README.md
@@ -408,11 +447,16 @@ VideoGames-Tournament/
 ## 10. REST API — Endpoints
 
 ### Users
-| Method | Endpoint              | Description                       | Access |
-| ------ | --------------------- | --------------------------------- | ------ |
-| POST   | `/api/users/register` | Register a new player             | Public |
-| POST   | `/api/users/login`    | Authenticate user and issue token | Public |
-| GET    | `/api/users`          | List all registered players       | Admin  |
+| Method | Endpoint                    | Description                       | Access |
+| ------ | --------------------------- | --------------------------------- | ------ |
+| POST   | `/api/users/register`       | Register a new player             | Public |
+| POST   | `/api/users/login`          | Authenticate user and issue token | Public |
+| GET    | `/api/users`                | List all registered players       | Admin  |
+| POST   | `/api/users/forgot-password`| Request password reset email      | Public |
+| POST   | `/api/users/reset-password` | Reset password with token         | Public |
+| GET    | `/api/users/admins`         | List all admin users              | Admin  |
+| POST   | `/api/users/admin`          | Create a new admin user           | Admin  |
+| PATCH  | `/api/users/:id/demote`     | Demote admin to regular user      | Admin  |
 
 ### Tournaments
 | Method | Endpoint                      | Description                     | Access |
@@ -626,7 +670,7 @@ erDiagram
 
 ## 13. Sprint History
 
-The project follows an **adapted Scrum methodology**, organized into 4 sprints:
+The project follows an **adapted Scrum methodology**, organized into 6 sprints:
 
 | Sprint | Version          | Date                 | Main Focus                                                                     |
 | ------ | ---------------- | -------------------- | ------------------------------------------------------------------------------ |
@@ -634,9 +678,10 @@ The project follows an **adapted Scrum methodology**, organized into 4 sprints:
 | 2      | v0.8.1 – v0.8.6  | Mar 23 – Apr 5, 2026 | Modular frontend structure and player visualization                            |
 | 3      | v0.9.0           | Apr 8, 2026          | Security: bcrypt encryption, validations, error handling                       |
 | 4      | v0.9.5 – v9.8.0  | Apr 22 – May 5, 2026 | Tournament management, enrollment, Chart.js statistics, full integration       |
-| 5      | v10.0.0          | Jun 4, 2026          | JWT authentication, database FKs, environment variables, security hardening    |
+| 5      | v10.0.0 – v11.0.0| Jun 4, 2026          | JWT authentication, real-time Socket.io, tournament search & edit              |
+| 6      | v12.0.0          | Jun 6–7, 2026        | Cyber Neon redesign, animated background, password reset, admin management     |
 
-### Current Status (v10.0.0 — June 4, 2026)
+### Current Status (v12.0.0 — June 7, 2026)
 
 **Implemented:**
 - JWT token-based authentication with role-based authorization
@@ -644,16 +689,22 @@ The project follows an **adapted Scrum methodology**, organized into 4 sprints:
 - Environment variable configuration (`.env`) for credentials and JWT secret
 - FOREIGN KEY constraints on all 8 database tables
 - Centralized Axios service with automatic JWT attachment
+- Real-time updates via Socket.io (tournament CRUD, player registration)
 - Complete flow: Register → Login → Browse games → Enroll → Admin panel
 - Player tournament enrollment with autocomplete search
 - Dynamic admin statistics (Chart.js)
 - Metrics: total tournaments, active, finished, total players, average prize pool
+- Cyber Neon visual redesign with dark gaming theme
+- Animated Canvas particle background
+- Password reset via email (Nodemailer + crypto tokens)
+- Admin management (create, list, demote to user)
 
 **In Progress:**
 - Tournament status management (finish / cancel tournaments)
 - Player participation analytics per tournament
 - Advanced statistics with time-based activity tracking
 - Admin controls for registrations
+- Bracket/match generation and management
 
 ---
 

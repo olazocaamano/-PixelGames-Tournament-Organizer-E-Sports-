@@ -5,8 +5,8 @@
 body {
   margin: 0;
   font-family: 'Orbitron', sans-serif;
-  color: #f8fafc;
-  background: linear-gradient(135deg, #232143, #2b6451);
+  color: #f1f5f9;
+  background: linear-gradient(135deg, #0b0f1a, #141b2b);
   min-height: 94.9vh;
 }
 
@@ -27,7 +27,7 @@ body {
   width: 90%;
   max-width: 1400px;
   min-height: calc(100vh - 80px);
-  background-color: #222;
+  background-color: rgba(26, 32, 53, 0.6);
   border-radius: 30px;
   box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
   padding: 30px;
@@ -58,7 +58,7 @@ body {
 .list-games {
   width: 300px;
   padding: 20px;
-  background-color: #2e2e2e;
+  background-color: #222a40;
   border-radius: 20px;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.4);
   overflow-y: auto;
@@ -71,7 +71,7 @@ body {
 
 .list-games p {
   margin: 0 0 15px 0;
-  color: #a0a0a0;
+  color: #94a3b8;
 }
 
 .list-games ul {
@@ -92,7 +92,7 @@ body {
   max-width: 965px;
   height: 55px;
   padding: 15px;
-  background-color: #258816;
+  background-color: #0891b2;
   border-radius: 10px;
   text-align: center;
   text-decoration: none;
@@ -102,7 +102,7 @@ body {
 }
 
 .statistics-button:hover {
-  background-color: #206915;
+  background-color: #0e7490;
   transform: scale(1.02);
 }
 
@@ -252,7 +252,7 @@ body {
 }
 
 .box-adminLogin-logout button:hover {
-  background-color: #2e2e2e;
+  background-color: #222a40;
   font-size: 20px;
 }
 
@@ -261,7 +261,7 @@ body {
   margin: auto auto;
   width: 300px;
   height: 380px;
-  background-color: #2e2e2e;
+  background-color: rgba(34, 42, 64, 0.6);
   border-radius: 15px;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.4);
   padding: 20px;
@@ -279,7 +279,7 @@ body {
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 28px;
-  border-bottom: 1px solid #555;
+  border-bottom: 1px solid #475569;
   padding-bottom: 10px;
 }
 
@@ -294,14 +294,14 @@ body {
 
 .resetPass a,
 .register a {
-  color: rgb(182, 255, 129);
+  color: #00e5ff;
   text-decoration: none;
   transition: 0.2s;
 }
 
 .resetPass a:hover,
 .register a:hover {
-  color: rgb(120, 167, 86);
+  color: #0891b2;
 }
 
 .admin-access {
@@ -310,14 +310,14 @@ body {
 
 .admin-access a {
   font-size: 12px;
-  color: rgb(86, 86, 86);
+  color: #475569;
   text-decoration: none;
   transition: 0.3s;
 }
 
 .admin-access a:hover {
   text-decoration: underline;
-  color: black;
+  color: #f1f5f9;
 }
 
 form {
@@ -331,21 +331,21 @@ input {
   border-radius: 8px;
   border: none;
   outline: none;
-  background-color: #1f1f1f;
+  background-color: #141b2b;
   color: white;
   font-size: 16px;
   transition: 0.2s;
 }
 
 input:focus {
-  box-shadow: 0 0 6px #258816;
+  box-shadow: 0 0 6px #0891b2;
 }
 
 button {
   padding: 10px;
   border-radius: 8px;
   border: none;
-  background-color: #258816;
+  background-color: #0891b2;
   color: white;
   font-size: 16px;
   cursor: pointer;
@@ -353,7 +353,7 @@ button {
 }
 
 button:hover {
-  background-color: #206915;
+  background-color: #0e7490;
   transform: scale(1.05);
 }
 
@@ -378,7 +378,7 @@ button:hover {
   width: 90%;
   max-width: 1500px;
   min-height: calc(100vh - 80px);
-  background-color: #222;
+  background-color: #1a2035;
   border-radius: 30px;
   box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
   padding: 30px;
@@ -390,7 +390,7 @@ button:hover {
   margin: 0 auto;
   width: 70px;
   height: 70px;
-  background-color: #206915;
+  background-color: #0e7490;
   border-radius: 50%;
   box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
   justify-content: space-between;
@@ -417,7 +417,7 @@ button:hover {
   align-items: center;
   height: 40px;
   width: 40px;
-  background-color: #2f2f2f;
+  background-color: #222a40;
   border-radius: 50%;
   margin-left: 10px;
   margin-right: 5px;
@@ -451,7 +451,7 @@ button:hover {
   font-size: 25px;
   transition: 0.3s;
   display: inline-block;
-  background-color: #258816;
+  background-color: #0891b2;
   height: 40px;
   width: auto;
   padding: 0 20px;
@@ -471,8 +471,8 @@ button:hover {
 
 .menu button.active {
   background-color: transparent;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), 0 0 10px #37e028;
-  color: rgb(35, 152, 56);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), 0 0 10px #00e5ff;
+  color: #00e5ff;
 }
 
 .logout {
@@ -481,7 +481,7 @@ button:hover {
   font-size: 25px;
   transition: 0.3s;
   display: inline-block;
-  background-color: #881616;
+  background-color: #dc2626;
   height: 40px;
   width: auto;
   padding: 0 20px;
@@ -527,7 +527,7 @@ button:hover {
   width: 100%;
   max-width: 1500px;
   height: 560px;
-  background-color: #222;
+  background-color: #1a2035;
   border-radius: 30px;
   box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
   padding: 10px;
@@ -543,7 +543,7 @@ button:hover {
   width: 98%;
   height: 50px;
   border-radius: 30px;
-  background-color: #1c1c1c;
+  background-color: #141b2b;
   align-items: center;
   box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
   align-items: center;
@@ -562,7 +562,7 @@ button:hover {
   align-items: center;
   height: 40px;
   width: 40px;
-  background-color: #2f2f2f;
+  background-color: #222a40;
   border-radius: 50%;
   margin-left: 10px;
   margin-right: 5px;
@@ -587,7 +587,7 @@ button:hover {
   height: 470px;
   border-radius: 30px;
   overflow: hidden;
-  background-color: #2f2f2f;
+  background-color: #222a40;
   box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
 }
 
@@ -616,7 +616,7 @@ button:hover {
 .box-activity-content h2 {
   text-align: center;
   margin: 10px 0 20px 0;
-  border-bottom: 2px solid #444;
+  border-bottom: 2px solid #334155;
   padding-bottom: 10px;
 }
 
@@ -634,27 +634,27 @@ button:hover {
   padding: 15px;
   margin-bottom: 5px;
   list-style: none;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #1e293b;
   transition: background 0.2s ease;
 }
 
 .box-tournaments-content ul li:hover,
 .box-activity-content ul li:hover {
-  background-color: rgba(120, 255, 120, 0.05);
+  background-color: rgba(0, 229, 255, 0.05);
 }
 
 .box-tournaments-content li strong {
-  color: #5ff883;
+  color: #00e5ff;
   font-size: 18px;
 }
 
 .box-activity-content li strong {
-  color: #f8fafc;
+  color: #f1f5f9;
   font-size: 16px;
 }
 
 .box-activity-content small {
-  color: #a0a0a0;
+  color: #94a3b8;
   font-size: 13px;
 }
 
@@ -667,28 +667,28 @@ button:hover {
 }
 
 .status.pending {
-  border: 1px solid #ffcc00;
-  color: #ffcc00;
+  border: 1px solid #f59e0b;
+  color: #f59e0b;
 }
 
 .status.active {
-  border: 1px solid #28a745;
-  color: #28a745;
+  border: 1px solid #22c55e;
+  color: #22c55e;
 }
 
 .status.ongoing {
-  border: 1px solid #ff9500;
-  color: #ff9500;
+  border: 1px solid #f59e0b;
+  color: #f59e0b;
 }
 
 .status.finished {
-  border: 1px solid #eb0000;
-  color: #eb0000;
+  border: 1px solid #ef4444;
+  color: #ef4444;
 }
 
 .status.cancelled {
-  border: 1px solid #999;
-  color: #999;
+  border: 1px solid #64748b;
+  color: #64748b;
 }
 
 .box-tournaments-content li button {
@@ -697,13 +697,13 @@ button:hover {
   border-radius: 6px;
   border: none;
   cursor: pointer;
-  background-color: #258816;
+  background-color: #0891b2;
   color: white;
   transition: 0.2s;
 }
 
 .box-tournaments-content li button:hover {
-  background-color: #206915;
+  background-color: #0e7490;
 }
 
 .box-tournaments-content li,
@@ -719,7 +719,7 @@ button:hover {
   height: 470px;
   border-radius: 30px;
   overflow: hidden;
-  background-color: #2f2f2f;
+  background-color: #222a40;
   box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
 }
 
@@ -759,7 +759,7 @@ button:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -784,7 +784,7 @@ button:hover {
 }
 
 .modal {
-  background-color: #2f2f2f;
+  background-color: #222a40;
   padding: 30px;
   border-radius: 20px;
   width: 500px;
@@ -811,7 +811,7 @@ button:hover {
   display: flex;
   justify-content: center;
   width: 10%;
-  background: #881616;
+  background: #dc2626;
   color: white;
   border: none;
   border-radius: 8px;
@@ -823,11 +823,11 @@ button:hover {
 }
 
 .close-btn:hover {
-  background: #eb0000;
+  background: #ef4444;
 }
 
 .modal-edit {
-  background-color: #2f2f2f;
+  background-color: #222a40;
   padding: 30px;
   border-radius: 20px;
   width: 500px;
@@ -844,7 +844,7 @@ button:hover {
   margin-bottom: 10px;
   border-radius: 8px;
   border: none;
-  background-color: #1f1f1f;
+  background-color: #141b2b;
   color: white;
   font-size: 16px;
 }
@@ -864,26 +864,26 @@ button:hover {
   justify-content: space-between;
   align-items: center;
   padding: 15px 25px;
-  border-bottom: 2px solid #444;
+  border-bottom: 2px solid #334155;
 }
 
 .players-search-bar input {
   width: 60%;
   padding: 10px 15px;
   border-radius: 10px;
-  border: 1px solid #555;
-  background-color: #1a1a1a;
-  color: #f8fafc;
+  border: 1px solid #475569;
+  background-color: #0b0f1a;
+  color: #f1f5f9;
   font-size: 16px;
 }
 
 .players-search-bar input:focus {
-  box-shadow: 0 0 10px #258816;
+  box-shadow: 0 0 10px #0891b2;
 }
 
 .player-count {
   font-size: 18px;
-  color: #a0a0a0;
+  color: #94a3b8;
 }
 
 .players-grid {
@@ -904,7 +904,7 @@ button:hover {
 }
 
 .bar-bottom {
-  background-color: #1c1c1c;
+  background-color: #141b2b;
   width: 102.2%;
   height: 50px;
   border-radius: 30px;
@@ -924,25 +924,25 @@ button:hover {
 }
 
 .players-grid::-webkit-scrollbar-thumb {
-  background: rgba(37, 136, 22, 0.6);
+  background: rgba(0, 229, 255, 0.6);
   border-radius: 20px;
 }
 
 .pixel-table {
   width: 100%;
   border-collapse: collapse;
-  color: #f8fafc;
+  color: #f1f5f9;
 }
 
 .pixel-table th {
   text-align: left;
   padding: 15px;
-  background-color: #1c1c1c;
-  color: #ffffff;
+  background-color: #141b2b;
+  color: #f1f5f9;
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  border-bottom: 2px solid #555;
+  border-bottom: 2px solid #475569;
 }
 
 .pixel-table th.text-center {
@@ -950,12 +950,12 @@ button:hover {
 }
 
 .grid-row {
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #1e293b;
   transition: background 0.2s ease;
 }
 
 .grid-row:hover {
-  background-color: rgba(120, 255, 120, 0.05);
+  background-color: rgba(0, 229, 255, 0.05);
 }
 
 .pixel-table td {
@@ -970,13 +970,13 @@ button:hover {
 }
 
 .status-indicator.active {
-  background-color: #28a745 !important;
-  box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+  background-color: #22c55e !important;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
 }
 
 .status-indicator.inactive {
-  background-color: #eb0000 !important;
-  box-shadow: 0 0 10px rgba(235, 0, 0, 0.8);
+  background-color: #ef4444 !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
 }
 
 .player-identity-block {
@@ -985,12 +985,12 @@ button:hover {
 }
 
 .nickname-accent {
-  color: #5ff883;
+  color: #00e5ff;
   font-size: 20px;
 }
 
 .username-sub {
-  color: #a0a0a0;
+  color: #94a3b8;
   font-size: 14px;
 }
 
@@ -1004,14 +1004,14 @@ button:hover {
 
 .role-badge.admin {
   background-color: transparent;
-  border: 1px solid #eb0000;
-  color: #eb0000;
+  border: 1px solid #ef4444;
+  color: #ef4444;
 }
 
 .role-badge.player {
   background-color: transparent;
-  border: 1px solid #00d4ff;
-  color: #00d4ff;
+  border: 1px solid #00e5ff;
+  color: #00e5ff;
 }
 
 .action-buttons-group {
@@ -1021,21 +1021,21 @@ button:hover {
 }
 
 .btn-manage {
-  background-color: #258816;
+  background-color: #0891b2;
   padding: 5px 12px;
   font-size: 14px;
   border-radius: 6px;
 }
 
 .btn-logs {
-  background-color: #444;
+  background-color: #334155;
   padding: 5px 12px;
   font-size: 14px;
   border-radius: 6px;
 }
 
 .btn-logs:hover {
-  background-color: #555;
+  background-color: #475569;
 }
 
 /* Autocomplete container */
@@ -1043,7 +1043,7 @@ button:hover {
   width: 100%;
   max-width: 500px;
   margin: auto;
-  background-color: #2f2f2f;
+  background-color: #222a40;
   padding: 20px;
   border-radius: 20px;
   box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
@@ -1054,7 +1054,7 @@ button:hover {
   list-style: none;
   margin: 10px 0;
   padding: 0;
-  background-color: #1f1f1f;
+  background-color: #141b2b;
   border-radius: 10px;
   max-height: 200px;
   overflow-y: auto;
@@ -1066,30 +1066,30 @@ button:hover {
   display: flex;
   justify-content: space-between;
   cursor: pointer;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #1e293b;
   transition: 0.2s;
 }
 
 /* Hover */
 .autocomplete-dropdown li:hover {
-  background-color: rgba(120,255,120,0.08);
+  background-color: rgba(0, 229, 255, 0.08);
 }
 
 /* Active (keyboard selection) */
 .autocomplete-dropdown li.active {
-  background-color: #258816;
+  background-color: #0891b2;
 }
 
 /* Prize */
 .autocomplete-dropdown span {
-  color: #5ff883;
+  color: #00e5ff;
 }
 
 /* Selected */
 .selected-tournament {
   margin: 10px 0;
   padding: 10px;
-  background-color: #1c1c1c;
+  background-color: #141b2b;
   border-radius: 10px;
 }
 
@@ -1116,13 +1116,13 @@ button:hover {
 }
 
 .autocomplete-dropdown::-webkit-scrollbar-thumb {
-  background: rgba(37, 136, 22, 0.6);
+  background: rgba(0, 229, 255, 0.6);
   border-radius: 20px;
 }
 
 /* Active item stronger highlight */
 .autocomplete-dropdown li.active {
-  background-color: #258816;
+  background-color: #0891b2;
   transform: scale(1.02);
 }
 
@@ -1145,7 +1145,7 @@ button:hover {
 .chart-box {
     width: 100%;
     max-width: 800px;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(15, 23, 42, 0.8);
     border-radius: 20px;
     padding: 25px;
     box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.5);
@@ -1161,7 +1161,7 @@ button:hover {
     text-align: center;
     margin-bottom: 15px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    color: #fbb812; /* tu color de marca */
+    color: #00e5ff; /* tu color de marca */
 }
 
 .chart-box canvas {

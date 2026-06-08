@@ -18,6 +18,90 @@ This table defines the prefixes used to identify which component of the system i
 
 ---
 
+---
+
+## Version [FE]-v12.0.0 / [BE]-v12.0.0 / [API]-v12.0.0 / [DB]-v12.0.0 / [CONFIG]-v12.0.0 / [DOC]-v12.0.0
+### Cyber Neon redesign, animated background, password reset & admin management (June 06–07, 2026)
+
+This sprint introduced a full visual overhaul with the Cyber Neon palette, a Canvas-based animated particle background, a complete password reset flow via email, and admin management capabilities (create, list, demote).
+
+---
+
+### Added
+
+- **Cyber Neon visual redesign (`App.css`):**
+  - New dark gradient background (`#0b0f1a` → `#141b2b`)
+  - Cyan (`#00e5ff`, `#0891b2`) as primary accent replacing green
+  - Purple (`#a855f7`) as secondary accent
+  - Slate-based surfaces (`#1a2035`, `#222a40`) replacing generic grays
+  - Updated semantic colors: `#22c55e` (success), `#f59e0b` (warning), `#ef4444` (error), `#64748b` (neutral)
+  - Consistent text hierarchy: `#f1f5f9` (primary), `#94a3b8` (muted)
+  - `rgba(0, 229, 255, ...)` glows and hover effects throughout the UI
+- **Animated particle background:**
+  - `frontend/src/components/BackgroundAnimation.jsx` — Canvas-based engine with 50 floating pixel particles
+  - Particles in cyan, purple, and green with subtle glow (`shadowBlur`)
+  - Proximity-based connection lines for a cyber-grid effect
+  - Automatic resize, `pointer-events: none`, zero performance impact on UI
+- **Password reset flow:**
+  - `backend/utils/emailService.js` — Nodemailer transporter with SMTP config or Ethereal fallback
+  - `backend/controllers/usersController.js` — `forgotPassword` (generates crypto token, stores in DB, sends email) and `resetPassword` (validates token, updates bcrypt hash)
+  - `frontend/src/pages/ForgotPassword.jsx` — Email input page (styled like admin login)
+  - `frontend/src/pages/ResetPassword.jsx` — New password form with token from URL params
+  - `password_resets` database table with 1-hour token expiry
+  - Activity logging for reset requests and completions
+- **Admin management:**
+  - `POST /api/users/admin` — Create admin (protected, admin-only)
+  - `GET /api/users/admins` — List all admin users
+  - `PATCH /api/users/:id/demote` — Demote admin to player (prevents self-demotion)
+  - Admin panel "Admins" tab with create form + current admins list + demote buttons
+  - Activity logging for admin creation and demotion
+
+---
+
+### Changed
+
+- `App.css` — All 1196 lines reviewed; every color value migrated to Cyber Neon palette
+- `App.jsx` — Now wraps `<BackgroundAnimation />` as first child with `z-index: 0`, content at `z-index: 1`
+- `Home.jsx` — Password reset link redirected from `/reset` (dead route) to `/forgot-password`
+- `backend/.env` — Added `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `FRONTEND_URL` variables
+- `backend/package.json` — Added `nodemailer` dependency
+- `frontend/src/services/userService.js` — Added `forgotPassword(email)` and `resetPassword(token, password)` API functions
+
+---
+
+### Fixed
+
+- Dead route `/reset` in `Home.jsx` — now correctly points to `/forgot-password`
+- Overly aggressive `rgba(0,0,0,0.6)` replacement reverted to correct values for box-shadows and modal overlay
+
+---
+
+### In Progress
+
+- Bracket/match generation and management
+- Player participation analytics per tournament
+- Advanced statistics (time-based activity tracking)
+- Admin controls for registration management
+
+---
+
+### System Status
+
+- UI fully restyled with gaming-oriented Cyber Neon theme
+- Password reset flow complete: forgot → email → reset token → new password → redirect to login
+- Admin management operational: create, list, demote with real-time activity logging
+- Animated background runs at 60fps with zero UI interference
+
+---
+
+### Notes
+
+- SMTP must be configured in `.env` for production emails. Without it, emails are sent via Ethereal (test accounts) with preview URL shown in backend console and API response.
+- The password reset token expires in 1 hour. A single-use policy is enforced.
+- Admins cannot demote themselves. A minimum of one admin must remain.
+
+---
+
 ## Version [FE]-v11.0.0 / [BE]-v11.0.0 / [API]-v11.0.0 / [DOC]-v11.0.0
 ### Real-time tournament control, admin search & edit, player dashboard (June 04, 2026)
 
@@ -98,6 +182,7 @@ This sprint introduced real-time communication via Socket.io, allowing admin tou
 - Restart the backend server (`node backend/index.js`) for Socket.io changes to take effect
 - Socket.io auto-connects when the player/admin dashboard loads and disconnects on logout
 - Room-based events ensure `tournament:registered` only reaches the intended user
+
 
 ---
 

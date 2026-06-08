@@ -74,6 +74,12 @@ function Admin() {
     // Search
     const [searchTerm, setSearchTerm] = useState("");
 
+    // Admin management state
+    const [newAdmin, setNewAdmin] = useState({ username: "", email: "", password: "" });
+    const [adminMessage, setAdminMessage] = useState("");
+    const [admins, setAdmins] = useState([]);
+    const [loadingAdmins, setLoadingAdmins] = useState(false);
+
     /*
         Load players from API on component mount
      */
@@ -227,6 +233,52 @@ function Admin() {
 
         fetchGames();
     }, []);
+
+    const handleCreateAdmin = async (e) => {
+        e.preventDefault();
+        setAdminMessage("");
+        try {
+            await API.post("/users/admin", newAdmin);
+            setAdminMessage("Admin created successfully");
+            setNewAdmin({ username: "", email: "", password: "" });
+        } catch (err) {
+            setAdminMessage(err.response?.data?.error || "Error creating admin");
+        }
+    };
+
+    const handleAdminInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewAdmin((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const fetchAdmins = useCallback(async () => {
+        setLoadingAdmins(true);
+        try {
+            const res = await API.get("/users/admins");
+            setAdmins(res.data);
+        } catch {
+            setAdmins([]);
+        } finally {
+            setLoadingAdmins(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (activeSection === "admins") {
+            fetchAdmins();
+        }
+    }, [activeSection, fetchAdmins]);
+
+    const handleDemoteAdmin = async (id, username) => {
+        if (!window.confirm(`Demote "${username}" to regular user?`)) return;
+        try {
+            await API.patch(`/users/${id}/demote`);
+            setAdminMessage(`"${username}" demoted to user`);
+            fetchAdmins();
+        } catch (err) {
+            setAdminMessage(err.response?.data?.error || "Error demoting admin");
+        }
+    };
 
     /*
         Socket connection for real-time updates
@@ -432,6 +484,15 @@ function Admin() {
                             onClick={() => setActiveSection("statistics")}
                         >
                             Statistics
+                        </button>
+                    </li>
+
+                    <li>
+                        <button
+                            className={activeSection === "admins" ? "active" : ""}
+                            onClick={() => setActiveSection("admins")}
+                        >
+                            Admins
                         </button>
                     </li>
 
@@ -644,6 +705,135 @@ function Admin() {
                                 <div style={{ height: "350px" }}>
                                     <Bar data={chartData} options={chartOptions} />
                                     <Bar data={gameChartData} options={chartOptions} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeSection === "admins" && (
+                    <div className="admin-box">
+                        <div className="top">
+                            <div className="circle">
+                                <img src="/images/iconos/administrador.png" className="icono" />
+                            </div>
+                            <h2>Admin Management</h2>
+                        </div>
+
+                        <div style={{
+                            display: "flex",
+                            gap: 24,
+                            padding: "24px 32px",
+                            justifyContent: "center",
+                            alignItems: "stretch",
+                            flexWrap: "wrap",
+                        }}>
+                            {/* Create admin form */}
+                            <div style={{
+                                flex: "1 1 340px",
+                                maxWidth: 420,
+                                backgroundColor: "#222a40",
+                                borderRadius: 20,
+                                padding: "24px 28px",
+                                boxShadow: "5px 5px 15px rgba(0,0,0,0.4)",
+                            }}>
+                                <h2 style={{ textAlign: "center", margin: "0 0 20px 0", color: "#00e5ff", fontSize: 22 }}>
+                                    Create New Admin
+                                </h2>
+                                <form onSubmit={handleCreateAdmin}>
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        placeholder="Username"
+                                        required
+                                        value={newAdmin.username}
+                                        onChange={handleAdminInputChange}
+                                    />
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        placeholder="Email"
+                                        required
+                                        value={newAdmin.email}
+                                        onChange={handleAdminInputChange}
+                                    />
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        placeholder="Password (min 6 characters)"
+                                        required
+                                        value={newAdmin.password}
+                                        onChange={handleAdminInputChange}
+                                    />
+                                    <button type="submit">Create Admin</button>
+                                    {adminMessage && (
+                                        <p style={{
+                                            textAlign: "center",
+                                            marginTop: 10,
+                                            color: adminMessage.includes("success") || adminMessage.includes("demoted")
+                                                ? "#22c55e" : "#ef4444"
+                                        }}>
+                                            {adminMessage}
+                                        </p>
+                                    )}
+                                </form>
+                            </div>
+
+                            {/* Current admins list */}
+                            <div style={{
+                                flex: "1 1 340px",
+                                maxWidth: 500,
+                                backgroundColor: "#222a40",
+                                borderRadius: 20,
+                                padding: "24px 28px",
+                                boxShadow: "5px 5px 15px rgba(0,0,0,0.4)",
+                            }}>
+                                <h2 style={{ textAlign: "center", margin: "0 0 20px 0", borderBottom: "2px solid #334155", paddingBottom: 12 }}>
+                                    Current Admins ({admins.length})
+                                </h2>
+                                <div style={{ maxHeight: 340, overflowY: "auto" }}>
+                                    {loadingAdmins ? (
+                                        <p style={{ textAlign: "center", color: "#94a3b8", padding: 20 }}>Loading...</p>
+                                    ) : admins.length === 0 ? (
+                                        <p style={{ textAlign: "center", color: "#94a3b8", padding: 20 }}>No admins found</p>
+                                    ) : (
+                                        <ul style={{ padding: 0, margin: 0 }}>
+                                            {admins.map((admin) => (
+                                                <li key={admin.id} style={{
+                                                    display: "flex",
+                                                    justifyContent: "space-between",
+                                                    alignItems: "center",
+                                                    padding: "14px 0",
+                                                    listStyle: "none",
+                                                    borderBottom: "1px solid #1e293b",
+                                                }}>
+                                                    <div>
+                                                        <strong style={{ color: "#00e5ff", fontSize: 16 }}>{admin.username}</strong>
+                                                        <br />
+                                                        <small style={{ color: "#94a3b8" }}>{admin.email}</small>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleDemoteAdmin(admin.id, admin.username)}
+                                                        style={{
+                                                            backgroundColor: "#dc2626",
+                                                            padding: "6px 14px",
+                                                            fontSize: 13,
+                                                            whiteSpace: "nowrap",
+                                                            borderRadius: 6,
+                                                            border: "none",
+                                                            color: "white",
+                                                            cursor: "pointer",
+                                                            transition: "0.2s",
+                                                        }}
+                                                        onMouseEnter={(e) => e.target.style.backgroundColor = "#ef4444"}
+                                                        onMouseLeave={(e) => e.target.style.backgroundColor = "#dc2626"}
+                                                    >
+                                                        Demote to User
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
                                 </div>
                             </div>
                         </div>

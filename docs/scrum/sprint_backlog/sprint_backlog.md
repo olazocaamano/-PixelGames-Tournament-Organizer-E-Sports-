@@ -271,6 +271,18 @@ As a user, I want tournament information and game images to load correctly.
 
 As an administrator, I want stable API endpoints so that system integrations work properly.
 
+### US-05 (added Jun 06–07)
+
+As an administrator, I want a modern gaming-themed UI so that the platform looks attractive to players.
+
+### US-06 (added Jun 06–07)
+
+As a user, I want to reset my password via email so that I can regain access to my account.
+
+### US-07 (added Jun 06–07)
+
+As an administrator, I want to manage other admin accounts so that I can control platform access.
+
 ---
 
 # Tasks
@@ -295,6 +307,13 @@ As an administrator, I want stable API endpoints so that system integrations wor
 | SB-16 | Refactor tournament services             |
 | SB-17 | Develop tournament status management     |
 | SB-18 | Develop advanced analytics               |
+| SB-19 | Implement Cyber Neon visual redesign (App.css) |
+| SB-20 | Implement Canvas animated particle background |
+| SB-21 | Create password reset backend (emailService, controllers, DB) |
+| SB-22 | Create forgot/reset password frontend pages |
+| SB-23 | Implement admin creation, list & demote endpoints |
+| SB-24 | Implement admin management UI in Admin panel |
+| SB-25 | Update CHANGELOG, README, SRS, sprint documentation |
 
 ---
 
@@ -311,6 +330,13 @@ As an administrator, I want stable API endpoints so that system integrations wor
 | Error handling improvements | 6     |
 | Bug fixing                  | 8     |
 | Analytics development       | 10    |
+| Cyber Neon UI redesign      | 6     |
+| Animated background         | 4     |
+| Password reset backend      | 8     |
+| Password reset frontend     | 4     |
+| Admin management backend    | 6     |
+| Admin management UI         | 4     |
+| Documentation updates       | 4     |
 
 ---
 
@@ -322,6 +348,9 @@ As an administrator, I want stable API endpoints so that system integrations wor
 * Database connectivity
 * Chart.js library
 * Authentication system
+* Canvas API (browser-native)
+* Nodemailer library
+* SMTP server or Ethereal test account
 
 ## Impediments
 
@@ -332,6 +361,8 @@ As an administrator, I want stable API endpoints so that system integrations wor
 | Static file issues                      | Medium | Corrected server configuration |
 | Database NULL values                    | High   | Added validations              |
 | Frontend/backend communication failures | High   | Refactored services            |
+| Dead password reset route in Home.jsx   | Medium | Redirected to /forgot-password |
+| No email service configured             | Medium | Added nodemailer with Ethereal fallback |
 
 ---
 
@@ -345,6 +376,10 @@ As an administrator, I want stable API endpoints so that system integrations wor
 * Manual testing completed
 * Documentation updated
 * Core user flow operational
+* Cyber Neon UI theme applied across all components
+* Animated background rendering at 60fps
+* Password reset flow fully functional (forgot → email → reset → redirect)
+* Admin management functional (create, list, demote)
 
 ```txt
 Register → Login → View Games → Join Tournament → Admin Dashboard

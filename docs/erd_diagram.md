@@ -5,6 +5,7 @@ erDiagram
     USERS ||--o{ MATCHES : participates
     USERS ||--o{ MATCHES : winner_of
     USERS ||--o{ ACTIVITY : generates
+    USERS ||--o{ PASSWORD_RESETS : requests
 
     GAMES ||--o{ TOURNAMENTS : used_in
 
@@ -73,6 +74,15 @@ erDiagram
         int match_id FK
         varchar action_type
         varchar description
+        datetime created_at
+    }
+
+    PASSWORD_RESETS {
+        int id PK
+        int user_id FK
+        varchar token
+        datetime expires_at
+        datetime used_at
         datetime created_at
     }
 
