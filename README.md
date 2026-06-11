@@ -9,6 +9,20 @@
   <img src="https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql" />
 </p>
 
+## 📹 Video Demo
+
+<p align="center">
+  <a href="https://drive.google.com/file/d/1r1Nr2p-P64E8iyHAccyi7GYlkMX5uzKQ/preview" target="_blank">
+    <img src="https://drive.google.com/thumbnail?id=1r1Nr2p-P64E8iyHAccyi7GYlkMX5uzKQ&sz=w680" alt="Video Demo" width="680" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://drive.google.com/file/d/1r1Nr2p-P64E8iyHAccyi7GYlkMX5uzKQ/view">
+    <img src="https://img.shields.io/badge/▶%20Ver%20Video%20Demo-4285F4?style=for-the-badge&logo=google-drive&logoColor=white" />
+  </a>
+</p>
+
 ---
 
 # 📚 Table of Contents
